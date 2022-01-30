@@ -17,7 +17,17 @@ class AlbumController extends Controller
 //     //   return $album->artists;
 //        foreach ($album->artists as $artist)
 //            print_r($artist->name."<br>");
-        return Album::get();
+        $albums = Album::with('artists')->get();
+////        foreach ($albums as &$album){
+//            $send = [ ];
+//            foreach ($album->artists as $artist){
+//               $send=$artist->name;
+//               print_r($artist->name);
+//            }
+//            $album["artist"]=$send;
+//      //      $album["artist"] = $album->artists;
+////        }
+        return $albums;
     }
     public function create(Request $request)
     {
