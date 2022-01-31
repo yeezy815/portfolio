@@ -21,8 +21,13 @@ export default {
 
 <style scoped>
 a{
-    color: #FFFFFF;    text-decoration: none;
+    color: rgba(17,17,14,0.58);
+    text-decoration: none;
 }
+a:hover{
+    color:#000
+}
+
 .comma{
     color: black;
 }

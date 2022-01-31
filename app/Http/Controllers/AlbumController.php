@@ -17,7 +17,7 @@ class AlbumController extends Controller
 //     //   return $album->artists;
 //        foreach ($album->artists as $artist)
 //            print_r($artist->name."<br>");
-        $albums = Album::with('artists')->get();
+        $albums = Album::with('artists')->OrderBy('year')->get();
 ////        foreach ($albums as &$album){
 //            $send = [ ];
 //            foreach ($album->artists as $artist){
@@ -59,10 +59,8 @@ class AlbumController extends Controller
 
     public function update(Request $request, $id)
     {
+        print_r($id);
         $album = Album::find($id);
-        $album->update([
-            "name" => $request["album"],
-            "year" => $request["year"]
-            ]);
+        $album->update($request->all());
     }
 }

@@ -1,12 +1,24 @@
 <template>
-<div class="album-item" @click="test()">
-    <span>Альбом: <input  class="album" v-model="album.name"></span>
-    <span>Исполнитель: <album-artist :artists="album.artists"/></span>
-    <span style="float:right">Год: <input  v-model="album.year"></span>
-    <div class="buttons" v-if="album.buttons">
-        <button>Сохранить</button>
-        <button>Отменить</button>
+<div class="album-item" @click="showButtons()">
+
+    <div class="data-list">
+        <span>Исполнитель: <album-artist :artists="album.artists"/></span>
     </div>
+    <div class="data-list">
+        <span>Альбом: <input  class="album" v-model="album.name"></span>
+    </div>
+    <div class="data-list">
+        <span  class="year"  >Год: <input v-model="album.year"></span>
+    </div>
+    <div class="data-list">
+        <span> elfkbnm</span>
+    </div>
+    <div class="buttons" v-if="buttons">
+        <button @click="updateAlbum()">Сохранить</button>
+        <button>Отменить</button>
+
+    </div>
+    <p v-if="updatestatus" >{{updatestatus}}</p>
 </div>
 </template>
 
@@ -21,10 +33,36 @@ export default {
             required: true
         }
     },
+    data(){
+        return{
+            updatestatus:"",
+            buttons:false
+        }
+    },
     methods:{
-        test(){
-            this.album.buttons = true;
+        showButtons(){
+            this.buttons = true;
             console.log("clickeyd");
+        },
+       async updateAlbum(){
+           try{
+               const response = await axios.put('api/albums/' + this.album.id,
+                   {
+                       name: this.album.name,
+                       year: this.album.year
+                   }
+               );
+               if (response.status === 200)
+                   this.updatestatus = "данные успешно обновлены";
+               else
+                   this.updatestatus = "не удалось обновить данные";
+               this.buttons = false;
+               console.log( response);
+
+           }
+           catch(e){
+               alert('error');
+           }
         }
     }
 }
@@ -42,17 +80,29 @@ export default {
     margin-bottom: 5px;
 }
 input{
-    background: none;
+    /*background: none;*/
+    width: 100px;
     border: 0px;
     font-size: 15px;
     outline:none;
 }
 .album{
-    width: 500px;
+    width: 300px;
 }
 
 .buttons{
     margin-top: 5px;
     margin-bottom: 5px;
+}
+.year{
+    float:right;
+
+}
+.year input{
+    width:60px
+}
+.data-list{
+    display: inline-block;
+    width: 25%;
 }
 </style>
