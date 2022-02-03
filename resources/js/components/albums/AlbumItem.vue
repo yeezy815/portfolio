@@ -1,5 +1,8 @@
 <template>
-<div class="album-item" @click="showButtons()">
+<div class="album-item"
+     @click="showButtons()"
+     @mouseover="hover = true"
+     @mouseleave="hover = false">
 
     <div class="data-list">
         <span>Исполнитель: <album-artist :artists="album.artists"/></span>
@@ -10,12 +13,14 @@
     <div class="data-list">
         <span  class="year"  >Год: <input v-model="album.year"></span>
     </div>
-    <div class="data-list">
-        <span> elfkbnm</span>
+    <div class="data-list" v-show="hover">
+        <button type="button" class="btn btn-danger"
+        @click="removeAlbum()"
+        >Удалить</button>
     </div>
     <div class="buttons" v-if="buttons">
-        <button @click="updateAlbum()">Сохранить</button>
-        <button>Отменить</button>
+        <button @click="updateAlbum()" class="btn btn-success">Сохранить</button>
+        <button class="btn btn-secondary" >Отменить</button>
 
     </div>
     <p v-if="updatestatus" >{{updatestatus}}</p>
@@ -26,7 +31,7 @@
 import AlbumArtist from "@/components/albums/AlbumArtist";
 export default {
     name: "AlbumItem",
-    components: {AlbumArtist},
+    components: { AlbumArtist},
     props:{
         album:{
             type: Object,
@@ -35,21 +40,45 @@ export default {
     },
     data(){
         return{
+            hover: false,
             updatestatus:"",
-            buttons:false
+            buttons:false,
+
         }
     },
     methods:{
+
         showButtons(){
             this.buttons = true;
-            console.log("clickeyd");
+        },
+        async removeAlbum(){
+
+            try{
+            //   const response = await axios.delete('api/albums/' + this.album.id);
+            //   if (response.status === 200) {
+                    this.updatestatus = "данные успешно обновлены";
+                    this.$emit('remove',this.album);
+            //   }
+            //   else
+              //      this.updatestatus = "не удалось обновить данные";
+                this.buttons = false;
+
+            }
+            catch(e){
+                alert(e);
+            }
         },
        async updateAlbum(){
+             const newar = [];
+            this.album.artists.forEach(element => newar.push(element.name));
+            console.log(newar);
            try{
                const response = await axios.put('api/albums/' + this.album.id,
                    {
+                       artists: newar,
                        name: this.album.name,
-                       year: this.album.year
+                       year: this.album.year,
+
                    }
                );
                if (response.status === 200)
@@ -61,7 +90,7 @@ export default {
 
            }
            catch(e){
-               alert('error');
+               alert(e);
            }
         }
     }
@@ -72,7 +101,7 @@ export default {
 .album-item{
     background-color:rgba(172,177,150,0.58);
     width:100%;
-    min-height: 30px;
+    min-height: 50px;
     /*#a0aec0*/
     display: inline-block;
     border: 1px solid;
@@ -80,9 +109,9 @@ export default {
     margin-bottom: 5px;
 }
 input{
-    /*background: none;*/
-    width: 100px;
-    border: 0px;
+    background: none;
+    width: 90%;
+    border: 0;
     font-size: 15px;
     outline:none;
 }

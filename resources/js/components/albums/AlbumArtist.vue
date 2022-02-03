@@ -1,10 +1,19 @@
 <template>
-    <a v-for="artist in artists"
-       :href="'/artist/' + artist.id">
+    <div v-for="artist in artists">
+<!--    <a v-if="edit"-->
+<!--       :href="'/artist/' + artist.id">-->
 
 
-        {{artist.name}}<span v-if="artist !== artists[artists.length - 1]" class="comma">, </span></a>
+<!--        {{artist.name}}<span v-if="artist !== artists[artists.length - 1]" class="comma">, </span></a>-->
+        <div>
+            <input v-model="artist.name" placeholder="исполнитель">
 
+            <button class="btn btn-danger">x</button>
+        </div>
+
+    </div>
+    <button class="btn btn-secondary" @click="addArtist">+</button>
+<!--    <button v-if="showbutton">+</button>-->
 </template>
 
 <script>
@@ -14,6 +23,22 @@ export default {
         artists:{
             type:Array,
             required: false
+        },
+        data(){
+            return{
+                edit: false,
+                showbutton: false
+            }
+        }
+    },
+    methods:{
+        addArtist()
+        {
+            const newartist = {
+                id: Date.now(),
+                name: null
+            }
+            this.artists.push(newartist)
         }
     }
 }
@@ -30,5 +55,12 @@ a:hover{
 
 .comma{
     color: black;
+}
+input{
+    background: none;
+    /*width: 100px;*/
+    border: 0;
+    font-size: 15px;
+    outline:none;
 }
 </style>

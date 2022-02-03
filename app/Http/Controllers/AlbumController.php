@@ -8,27 +8,29 @@ use Illuminate\Http\Request;
 
 class AlbumController extends Controller
 {
-    public function show()
+    public function show(Request $request)
     {
-   //    $album = Album::findOrFail($id);
+        $request->validate([
+            'min_year' => 'integer',
+            'max_year' => 'integer',
+           'sortBy'   => 'in:year,name,artists',
+            'sortorder' => 'in:asc,desc'
+        ]);
+        $album = new Album();
+        if (isset($request["album"]))
+            $album = $album->where('name', 'like', '%'.$request["album"].'%');
+        if (isset($request["min_year"]))
+            $album = $album->where('year', '>=', $request["min_year"]);
+        if (isset($request["max_year"]))
+            $album = $album->where('year', '<=', $request["max_year"]);
 
-//       // $album = Album::where('name', 'Kids See Ghosts')->first();
-//        print_r($album."<hr>");
-//     //   return $album->artists;
-//        foreach ($album->artists as $artist)
-//            print_r($artist->name."<br>");
-        $albums = Album::with('artists')->OrderBy('year')->get();
-////        foreach ($albums as &$album){
-//            $send = [ ];
-//            foreach ($album->artists as $artist){
-//               $send=$artist->name;
-//               print_r($artist->name);
-//            }
-//            $album["artist"]=$send;
-//      //      $album["artist"] = $album->artists;
-////        }
-        return $albums;
+     //   $albums = $album->with('artists')->OrderBy('year')->get();
+      //  return $albums;
+        $order = $request->sortBy ?? 'year';
+        $sortorder = $request->sortorder ?? 'asc';
+        return $album->with('artists')->OrderBy($order, $sortorder)->get();
     }
+
     public function create(Request $request)
     {
         $request->validate([
@@ -59,8 +61,20 @@ class AlbumController extends Controller
 
     public function update(Request $request, $id)
     {
-        print_r($id);
-        $album = Album::find($id);
-        $album->update($request->all());
+        $album = Album::findOrFail($id);
+        $artists = [];
+        print_r($request->artists);
+        foreach ($request->artists as $artist)
+        {
+            $artists[] = Artist::firstOrCreate([
+                'name' => $artist
+            ])["id"];
+        }
+        print_r($artists);
+        if ($artists){
+            $album->artists()->sync($artists);
+        }
+     //   print_r($album->with('artists')->get());
+        $album->update(["name" => $request->name, "year" => $request->year]);
     }
 }
