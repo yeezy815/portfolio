@@ -1,34 +1,33 @@
 <template>
-    <div v-for="artist in artists">
-<!--    <a v-if="edit"-->
-<!--       :href="'/artist/' + artist.id">-->
-
-
-<!--        {{artist.name}}<span v-if="artist !== artists[artists.length - 1]" class="comma">, </span></a>-->
-        <div>
-            <input v-model="artist.name" placeholder="исполнитель">
-
-            <button class="btn btn-danger">x</button>
+    <div  @mouseover="showaddbutton = true" @mouseleave="showaddbutton = false">
+        <p>Исполнитель: </p>
+        <div v-for="artist in artists">
+            <artist-item :artist="artist"
+            @remove="$emit('remove', artist)"/>
         </div>
-
+        <button class="btn btn-secondary" @click="addArtist" v-if="showaddbutton">+</button>
     </div>
-    <button class="btn btn-secondary" @click="addArtist">+</button>
 <!--    <button v-if="showbutton">+</button>-->
 </template>
 
 <script>
+import ArtistItem from "./ArtistItem";
 export default {
     name: "AlbumArtist",
+    emits: ['remove'],
+    components: {ArtistItem},
     props:{
         artists:{
             type:Array,
             required: false
         },
-        data(){
-            return{
-                edit: false,
-                showbutton: false
-            }
+    },
+
+    data(){
+        return{
+            showaddbutton: false,
+            edit: false,
+
         }
     },
     methods:{
@@ -39,7 +38,7 @@ export default {
                 name: null
             }
             this.artists.push(newartist)
-        }
+        },
     }
 }
 </script>

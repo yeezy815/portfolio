@@ -5,22 +5,23 @@
      @mouseleave="hover = false">
 
     <div class="data-list">
-        <span>Исполнитель: <album-artist :artists="album.artists"/></span>
+        <album-artist :artists="album.artists" @remove="deleteArtist"/>
     </div>
     <div class="data-list">
-        <span>Альбом: <input  class="album" v-model="album.name"></span>
+        <p>Альбом:</p> <input  class="album" v-model="album.name" placeholder="альбом">
     </div>
     <div class="data-list">
-        <span  class="year"  >Год: <input v-model="album.year"></span>
+        <p  class="year"  >Год: <input v-model="album.year" placeholder="год"></p>
     </div>
-    <div class="data-list" v-show="hover">
+    <div class="data-list" v-show="hover"  v-if="!creation">
         <button type="button" class="btn btn-danger"
         @click="removeAlbum()"
+
         >Удалить</button>
     </div>
-    <div class="buttons" v-if="buttons">
-        <button @click="updateAlbum()" class="btn btn-success">Сохранить</button>
-        <button class="btn btn-secondary" >Отменить</button>
+    <div class="buttons" v-if="buttons ">
+        <button @click="$emit('confirm', album)" class="btn btn-success">Сохранить</button>
+        <button class="btn btn-secondary" @click="$emit('cancel')">Отменить</button>
 
     </div>
     <p v-if="updatestatus" >{{updatestatus}}</p>
@@ -31,11 +32,25 @@
 import AlbumArtist from "@/components/albums/AlbumArtist";
 export default {
     name: "AlbumItem",
+    emits: ['remove', 'confirm', 'cancel'],
     components: { AlbumArtist},
     props:{
         album:{
             type: Object,
-            required: true
+            default: {
+                id: Date.now(),
+                year: null,
+                name: null,
+                artists: []
+            },
+            required: false
+        },
+        // buttons:{
+        //     default:false
+        // },
+        creation:{
+            type: Boolean,
+            default: false
         }
     },
     data(){
@@ -45,6 +60,10 @@ export default {
             buttons:false,
 
         }
+    },
+    mounted() {
+        if (this.creation === true)
+            this.buttons = true
     },
     methods:{
 
@@ -68,31 +87,9 @@ export default {
                 alert(e);
             }
         },
-       async updateAlbum(){
-             const newar = [];
-            this.album.artists.forEach(element => newar.push(element.name));
-            console.log(newar);
-           try{
-               const response = await axios.put('api/albums/' + this.album.id,
-                   {
-                       artists: newar,
-                       name: this.album.name,
-                       year: this.album.year,
-
-                   }
-               );
-               if (response.status === 200)
-                   this.updatestatus = "данные успешно обновлены";
-               else
-                   this.updatestatus = "не удалось обновить данные";
-               this.buttons = false;
-               console.log( response);
-
-           }
-           catch(e){
-               alert(e);
-           }
-        }
+        deleteArtist(artist){
+            this.album.artists=this.album.artists.filter(p => p.id !== artist.id);
+        },
     }
 }
 </script>

@@ -1,6 +1,6 @@
 <template>
     <div class="dialog"
-         v-if="show">
+       >
 
         <div  class="dialog__content">
             <slot>
@@ -38,7 +38,7 @@ export default {
     background: white;
     border-radius: 12px;
     min-height: 50px;
-    min-width:300px;
+    min-width:90%;
     padding: 20px;
 }
 </style>
