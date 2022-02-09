@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\Artist;
+use App\Models\Album;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -13,6 +15,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
+        $this->call([
+            AlbumSeeder::class,
+            DairySeeder::class
+        ]);
+
         // \App\Models\User::factory(10)->create();
     }
 }

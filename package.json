@@ -23,6 +23,7 @@
     "dependencies": {
         "vue": "^3.2.29",
         "vue-loader": "^17.0.0",
-        "vue-router": "^4.0.12"
+        "vue-router": "^4.0.12",
+        "vue-textarea-autosize": "^1.1.1"
     }
 }

@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 
 class AlbumController extends Controller
 {
-    public function show(Request $request)
+    public function index(Request $request)
     {
         $request->validate([
             'min_year' => 'integer',
@@ -34,10 +34,10 @@ class AlbumController extends Controller
       //  return $albums;
         $order = $request->sortBy ?? 'year';
         $sortorder = $request->sortorder ?? 'asc';
-        return $album->with('artists')->OrderBy($order, $sortorder)->get();
+        return $album->with('artists')->OrderBy($order, $sortorder)->paginate(10);
     }
 
-    public function create(Request $request)
+    public function store(Request $request)
     {
         $request->validate([
             //'artist' => 'required',
@@ -45,22 +45,30 @@ class AlbumController extends Controller
             'year' => 'required'
         ]);
         $artists = [];
+
+//        $artists[] = Artist::firstOrCreate([
+//            'name' => $request->artists
+//        ])["id"];
+            $artists = [];
         if ($request->artists)
-        $artists[] = Artist::firstOrCreate([
-            'name' => $request->artists
-        ])["id"];
-//        foreach ($request->artists as $artist)
-//        {
-//            $artists[] = Artist::firstOrCreate([
-//                'name' => $artist
-//            ])["id"];
-//        }
+            foreach ($request->artists as $artist)
+            {
+                $artists[] = Artist::firstOrCreate([
+                    'name' => $artist
+                ])["id"];
+            }
         $album =Album::create(["name" => $request["name"], "year" => $request["year"]]);
-        return $album->artists()->sync($artists);
+            $album->artists()
+            ->sync($artists);
+
+        return $album->id;
       // return $artist->albums()->syncWithoutDetaching($album);
 ////        return $album->artists()->syncWithoutDetaching($artist); //attach($artist);
     }
-
+    public function show($id)
+    {
+        return Album::with('artists')->findOrFail($id);
+    }
     public function destroy($id)
     {
         return Album::destroy($id);
@@ -78,7 +86,8 @@ class AlbumController extends Controller
                 ])["id"];
             }
         }
+        unset($request["artists"]);
         $album->artists()->sync($artists);
-        $album->update(["name" => $request->name, "year" => $request->year]);
+        $album->update($request->all());
     }
 }

@@ -2,8 +2,8 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use \App\Http\Controllers\ArtistController;
-use \App\Http\Controllers\AlbumController;
+use App\Http\Controllers\ArtistController;
+use App\Http\Controllers\AlbumController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -21,13 +21,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::get('/artists/{id}',[ArtistController::class,'show']);
 
+Route::resource('albums', AlbumController::class);
 
-Route::get('/albums/',[AlbumController::class,'show']);
-
-Route::post('/albums/',[AlbumController::class,'create']);
-
-Route::put('/albums/{id}',[AlbumController::class,'update']);
-
-Route::delete('/albums/{id}',[AlbumController::class,'destroy']);
-
-Route::get('/create',[AlbumController::class,'create']);
+Route::apiResource('dairy',\App\Http\Controllers\DairyController::class);

@@ -1,6 +1,6 @@
 <template>
-    <div  @mouseover="showaddbutton = true" @mouseleave="showaddbutton = false">
-        <p>Исполнитель: </p>
+    <div  @mouseover="showaddbutton = true" @mouseleave="showaddbutton = false" style="width: 100%; height: 100%">
+<!--        <p>Исполнитель: </p>-->
         <div v-for="artist in artists">
             <artist-item :artist="artist"
             @remove="$emit('remove', artist)"/>

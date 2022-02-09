@@ -3,21 +3,21 @@
        <p> Все прослушанные альбомы </p>
    </div>
     <select-bar
-    @filter="fetchAlbums"/>
+    @filter="filterAlbums"/>
     <my-dialog v-if="showdialog">
        <delete-confitm :album = "deletealbum" @cancel="showdialog = false"
        @confirm="deleteAlbum"/>
     </my-dialog>
     <my-dialog v-if="addalbum" >
 <!--        <create-form @cancel="addalbum = false" @confirm="test"/>-->
-        <div class="container">
-    <album-item @confirm="addAlbum"
-                @cancel="addalbum = false"
-                :creation="true"
-    />
-        </div>
+    <div class="container justify-content-md-center" >
+        <album-item @confirm="addAlbum"
+                    @cancel="addalbum = false"
+                    :creation="true"
+        />
+    </div>
     </my-dialog>
-    <div class="album-list">
+    <div class="album-list" >
         <album-item
             v-for="album in albums"
             :album="album"
@@ -25,7 +25,10 @@
             @confirm="updateAlbum"
 
         />
+
     </div>
+    <div class="spinner-border" role="status" v-if="showspinner"><span class="visually-hidden">Loading...</span>  </div>
+    <div   v-intersection="loadMorePosts" class="observer"></div>
     <div class="fixed-bottom" style="margin: 0 auto; width: 150px; margin-bottom: 10px">
         <button type="button" class="btn btn-info" @click="addalbum = true">добавить альбом</button></div>
 </template>
@@ -33,7 +36,7 @@
 <script>
 import AlbumItem from "@/components/albums/AlbumItem";
 import MyDialog from "../UI/MyDialog";
-import DeleteConfitm from "./DeleteConfitm";
+import DeleteConfitm from "./DeleteConfirm";
 import SelectBar from "./SelectBar";
 import CreateForm from "./CreateForm";
 export default {
@@ -45,13 +48,23 @@ export default {
             albums:[],
             showdialog: false,
             deletealbum: {},
-            addalbum: false
+            addalbum: false,
+            page: 0,
+            filter: {},
+            showspinner : true
         }
     },
 
     methods:{
         search(filter){
             console.log(filter)
+        },
+        filterAlbums(filter){
+            this.filter = filter
+            this.albums = []
+            this.page = 0
+            this.showspinner = true
+            this.fetchAlbums()
         },
         async addAlbum(album)
         {
@@ -84,20 +97,27 @@ export default {
                 alert(e);
             }
         },
-        async fetchAlbums(filter = null){
-            if (filter !== null) {
-                Object.keys(filter).forEach(key => {
-                    if (filter[key] === null || filter[key] === '') {
-                        delete filter[key];
+        async fetchAlbums(){
+           // filter = null
+
+            this.page+=1
+            if (this.filter !== null) {
+                Object.keys(this.filter).forEach(key => {
+                    if (this.filter[key] === null || this.filter[key] === '') {
+                        delete this.filter[key];
                     }
                 });
             }
-            console.log(filter)
-            const params = filter
+
+            this.filter.page = this.page
+            this.showspinner = false
+            console.log(this.filter)
+            const params = this.filter
 
             try{
                 const response = await axios.get('api/albums', {params: params} );
-               this.albums = response.data;
+        //       this.albums = response.data.data;
+                this.albums=[...this.albums,...response.data.data];
 
             }
             catch(e){
@@ -108,6 +128,10 @@ export default {
             this.showdialog = true;
             this.deletealbum = album
             //this.albums=this.albums.filter(p => p.id !== album.id);
+        },
+        loadMorePosts(){
+            console.log("222")
+            this.fetchAlbums()
         },
         async updateAlbum(album){
             const newar = [];
@@ -157,7 +181,7 @@ export default {
         },
     },
     mounted() {
-       this.fetchAlbums()
+     //  this.fetchAlbums()
     },
 }
 </script>
@@ -170,5 +194,8 @@ export default {
 .article {
     text-align: center;
     font-size: 20px;
+}
+.observer{
+    height:30px;
 }
 </style>
