@@ -1,8 +1,9 @@
 <template>
-    <div class="dialog"
-       >
-
+    <div class="dialog">
         <div  class="dialog__content">
+            <button class="btn btn-close pos-right-corner"
+            @click="$emit('close')"
+            ></button>
             <slot>
 
             </slot>
@@ -15,11 +16,17 @@
 
 export default {
     name: "MyDialog",
+    emits: ["close"],
     data(){
         return{
             show: true
         }
     },
+    methods: {
+        test(){
+            console.log("qqqqq")
+        }
+    }
 }
 </script>
 
@@ -40,5 +47,8 @@ export default {
     min-height: 50px;
     min-width:90%;
     padding: 20px;
+}
+.pos-right-corner{
+    float:right; display:flex;
 }
 </style>

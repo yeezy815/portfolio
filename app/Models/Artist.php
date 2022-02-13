@@ -12,6 +12,7 @@ class Artist extends Model
     protected $fillable = [
         "name"
     ];
+    protected $hidden= ["pivot"];
     public function albums()
     {
         return $this->belongsToMany(Album::class);

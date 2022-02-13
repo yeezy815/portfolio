@@ -10,7 +10,6 @@
                         @confirm="deleteAlbum(deletealbum)"/>
     </my-dialog>
     <my-dialog v-if="addalbum" >
-        <!--        <create-form @cancel="addalbum = false" @confirm="test"/>-->
         <div class="container justify-content-md-center" >
             <album-item @confirm="addAlbum"
                         @cancel="addalbum = false"

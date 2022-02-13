@@ -2,22 +2,18 @@
     <div class="select-bar">
         <p>сортировать по
             <select v-model="filter.sortBy">
-                <option value="year">
-                    году
-                </option>
-                <option value="artists">
-                    исполнителю
-                </option>
-                <option value="name">
-                   альбому
-                </option>
+                <option value="year">году </option>
+                <option value="artists">исполнителю</option>
+                <option value="name">  альбому</option>
             </select>
         <select v-model="filter.sortorder">
             <option value="asc">
-                возрастанию
+               <span v-if="filter.sortBy==='year'"> возрастанию</span>
+                <span v-else>А-я</span>
              </option>
             <option value="desc" selected>
-                убыванию
+                <span v-if="filter.sortBy==='year'"> убыванию</span>
+                <span v-else>я-А</span>
                </option>
         </select>
         </p>

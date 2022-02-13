@@ -36,7 +36,7 @@ class DairyController extends Controller
      */
     public function show($id)
     {
-        //
+        return Dairy::with('albums')->findOrFail($id);
     }
 
     /**

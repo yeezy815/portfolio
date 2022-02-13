@@ -18,6 +18,8 @@ class Dairy extends Model
         "description"
     ];
 
+    protected $hidden = ["created_at", "updated_at", "album_id"];
+
     public function albums()
     {
         return $this->belongsTo(Album::class,'album_id')->with('artists');

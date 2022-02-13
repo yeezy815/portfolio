@@ -10,29 +10,33 @@
                 <div class="row">
                     <div class="col-4" >
                        <p   >Дата:
-                           <my-input v-model="dairy.date" v-if="edit" placeholder="дата" />
+                           <my-input v-model="dairy.date" v-if="edit" placeholder="дд.мм.гггг" />
                            <span v-else>{{dairy.date}}</span>    </p>
                     </div>
-                    <div class="col" v-show="hover" >
+                    <div class="col" v-show="hover && !creation" >
                         <button @click="edit = true" class="btn btn-info">Изменить</button>
                         <button @click="$emit('remove', dairy)" class="btn btn-danger">Удалить</button>
                     </div>
 
                 </div>
-                <div class="row" @click="$emit('editalbum',dairy)" >
-                    <div class="col" >
-                        <p   >Альбом:
+                <div class="row" >
+                    <div class="col album-info" @click="$emit('editalbum',dairy)" >
+                        <div class="col" v-if="dairy.albums">
+                            <p>Альбом:
+<!--                                <my-input v-if="edit" v-model="dairy.albums.name" placeholder="альбом" />-->
+                                <span >{{dairy.albums.name}}</span>
+                            </p></div>
+                        <div class="col" v-if="dairy.albums">
+                            <span>Исполнитель:</span><br>
+                            <span v-for="artist in dairy.albums.artists">
+                                {{artist.name}}
+                                <span v-if="artist.id !== dairy.albums.artists[dairy.albums.artists.length-1].id">, </span>
+                            </span>
+                            <!--                            <my-input v-model="dairy.albums.name" placeholder="оценка" />-->
 
-                        <my-input v-if="edit" v-model="dairy.albums.name" placeholder="альбом" />
-                        <span v-else>{{dairy.albums.name}}</span>
-                        </p>
+                        </div>
                     </div>
-                        <div class="col" >
 
-                        <p>Исполнитель:  <p v-for="artist in dairy.albums.artists">{{artist.name}}<span v-if="artist.id !== dairy.albums.artists[dairy.albums.artists.length-1].id">, </span></p>
-<!--                            <my-input v-model="dairy.albums.name" placeholder="оценка" />-->
-                        </p>
-                    </div>
                     <div class="col" >
                         <p    >Оценка: <input v-model="dairy.score"  v-if="edit" placeholder="оценка" >
                         <span v-else><br> {{dairy.score}}</span>
@@ -55,7 +59,7 @@
             </div>
 
 
-            <div class="buttons" v-if="edit ">
+            <div class="buttons" v-if="edit || creation ">
                 <button @click="edit = false ; $emit('confirm', dairy)" class="btn btn-success">Сохранить</button>
                 <button class="btn btn-secondary" @click="edit = false">Отменить</button>
 
@@ -84,6 +88,8 @@ export default {
                 score: '',
                 experience: '',
                 description: '',
+                album_id: null,
+                albums:{}
             },
             required: false
         },
@@ -106,7 +112,7 @@ export default {
     },
     mounted() {
         if (this.creation === true)
-            this.buttons = true
+            this.edit = true
     },
     methods:{
 
@@ -149,7 +155,9 @@ export default {
     margin-bottom: 5px;
 }
 
-
+.album-info:hover{
+    background-color: #cbd5e0;
+}
 
 .buttons{
     margin-top: 5px;
