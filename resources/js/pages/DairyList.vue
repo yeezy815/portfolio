@@ -8,7 +8,6 @@
                     @confirm="updateAlbum"
                     @editalbum="editAlbum"
         />
-
     </div>
     <div class="spinner-border" role="status" v-if="showspinner"><span class="visually-hidden">Loading...</span>  </div>
     <div   v-intersection="loadMorePosts" class="observer"></div>
@@ -23,6 +22,7 @@
 
     <my-dialog v-if="adddairy" @close="adddairy = false">
         <dairy-item
+            :dairy="addeddairy"
             :creation="true"
             @cancel="adddairy = false"
             @remove="removeAlbum"
@@ -32,80 +32,29 @@
     </my-dialog>
 
 
-
-
-<!--    <my-dialog v-show="editalbum" @close="editalbum = false">-->
-<!--        <div class="row mx-auto w-50">-->
-
-<!--        <div class="row">-->
-<!--            <div class="col w-25">-->
-<!--                <button  class="btn btn-info w-100 mb-1" @click="selectalbum = true">-->
-<!--                    выбрать существующий альбом-->
-<!--                </button>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--    <div class="row">-->
-<!--        <div class="col w-25">-->
-<!--            <button  class="btn btn-info w-100 mb-5" @click="addalbum =true; " >-->
-<!--                создать новый альбом-->
-<!--            </button>-->
-<!--        </div>-->
-<!--    </div>-->
-<!--        <div class="row mx-auto w-50">-->
-<!--            <div class="col w-25  ">-->
-<!--                <button  class="btn btn-dark w-100" @click="editalbum =false; " >-->
-<!--                   отмена-->
-<!--                </button>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--    </div>-->
-<!--</my-dialog>-->
-
     <add-album
         v-show="editalbum"
         @selectalbum="selectalbum = true"
         @createalbum="addalbum = true"
         @close="editalbum=false"
     />
-    <my-dialog v-if="addalbum" @close="addalbum = false">
-        <div class="container justify-content-md-center" >
-            <album-item @confirm="addAlbum"
-                        @cancel="addalbum = false"
-                        :creation="true"
-            />
-        </div>
-    </my-dialog>
+    <create-album
+        v-show="addalbum"
+        @close="addalbum = false"
+        @cancel="addalbum = false"
+        @confirm="addAlbum"
+    />
 
-    <my-dialog v-if="selectalbum" @close="selectalbum = false">
-        <select-bar
-            @filter="filterAlbums"/>
-        <div style="width:80%">
-            <div style="margin-bottom: 5px"
-                 v-for="album in albums"
-                 @click="setAlbum(album)">
-                Исполнитель:
-                <span v-for="artist in album.artists">
-                     <span v-if="artist.id !==album.artists[0].id">, </span>
-                    {{artist.name}}
+    <select-album
+        v-if="selectalbum"
+        :albums="albums"
+        :album-settings="albumSettings"
+        @close="selectalbum = false"
+        @filter="filterAlbums"
+        @setAlbum="setAlbum"
+        @changePage="fetchAlbums"
+    />
 
-                </span>
-                Альбом: {{album.name}} - {{album.year}}</div>
-            <div   v-intersection="fetchAlbums" class="observer"></div>
-            <div style="position: absolute;
-                        left: 50%;
-                        transform: translate(-50%, -20px);
-                        border: 3px solid rgba(172,177,150,0.58);
-                        text-align: center;
-                        ">
-                 <div v-for="page in albumSettings.totalPages"
-                      @click="fetchAlbums(page)"
-                      :class="{'choosed' : page === albumSettings.currentPage}"
-                      style="display: inline-block; width: 30px; height: 30px; border: 2px solid #000000; ">
-                     {{page}}
-                 </div>
-            </div>
-        </div>
-    </my-dialog>
 </template>
 
 <script>
@@ -117,15 +66,21 @@ import CreateForm from "@/components/albums/CreateForm";
 import DairyItem from "@/components/dairies/DairyItem";
 import AlbumList from "@/pages/AlbumList";
 import AddAlbum from "@/components/dairies/AddAlbum";
+import CreateAlbum from "@/components/dairies/CreateAlbum";
+import SelectAlbum from "@/components/dairies/SelectAlbum";
+import {vModelSelect} from "vue";
 export default {
     name: "AlbumList.vue",
 
-    emits: ["remove", "confirm", "cancel", "close", "selectalbum", "createalbum"],
-    components: {AddAlbum, DairyItem, CreateForm, SelectBar, DeleteConfirm, AlbumItem, MyDialog, AlbumList},
+    emits: ["remove", "confirm", "cancel", "close", "selectalbum", "createalbum", "setAlbum"],
+    components: {
+        SelectAlbum,
+        CreateAlbum, AddAlbum, DairyItem, CreateForm, SelectBar, DeleteConfirm, AlbumItem, MyDialog, AlbumList},
     data(){
         return{
 
             dairies:[],
+            addeddairy: {},
             showdialog: false,
             deletealbum: {},
             addalbum: false,
@@ -143,11 +98,22 @@ export default {
             }
         }
     },
-
+    watch:{
+      // adddairy(val){
+      //     const dairy = {
+      //         id: Date.now(),
+      //         date: '',
+      //         score: '',
+      //         experience: '',
+      //         description: '',
+      //         album_id: null,
+      //         albums:{}
+      //     }
+      //    if (val)
+      //        this.dairies.push(dairy)
+      // }
+    },
     methods:{
-        search(filter){
-            console.log(filter)
-        },
         editAlbum(dairy)
             {
                 this.editalbum = true
@@ -158,18 +124,19 @@ export default {
         {
            // const newar = [];
           //  album.artists.forEach(element => newar.push(element.name));
-            //console.log(album);
+            console.log(dairy);
             try{
                 const response = await axios.post('api/dairy/', {
                     description: dairy.description,
                     score: dairy.score,
                     experience: dairy.experience,
-                    date: dairy.date
+                    date: dairy.date,
+                    album_id: dairy.album_id
                     }
 
                 );
 
-                if (response.status === 200){
+                if (response.status === 201){
                     this.addalbum = false
                     this.adddairy = false
                     this.dairies.push(dairy)
@@ -193,18 +160,27 @@ export default {
             this.fetchAlbums()
         },
         async setAlbum(album){
+            console.log(album)
             try {
                 // const response = await axios.put('api/dairy/' + this.dairyitem.id,
                 //     {
                 //         album_id: album.id
                 //     });
-                const objIndex = this.dairies.findIndex((o => o.id === this.dairyitem.id));
-                this.dairies[objIndex].albums = album
+
+                     const objIndex = this.dairies.findIndex((o => o.id === this.dairyitem.id));
+                if (!this.adddairy) {
+                    this.dairies[objIndex].albums = album
+                    this.dairies[objIndex].album_id = album.id
+                }
+                else {
+                    this.addeddairy.albums = album
+                    this.addeddairy.album_id = album.id
+                }
                 this.selectalbum = false
                 this.editalbum = false
             }
             catch (e){
-                console.log(response)
+                console.log(e)
             }
         },
         async addAlbum(album)
@@ -212,14 +188,12 @@ export default {
             console.log(album)
             const newar = [];
             album.artists.forEach(element => newar.push(element.name));
-            console.log(album);
             try{
                 const response = await axios.post('api/albums/',
                     {
                         artists: newar,
                         name: album.name,
                         year: album.year,
-
                     }
 
                 );
@@ -228,8 +202,16 @@ export default {
                     this.addalbum = false
                     const objIndex = this.dairies.findIndex((o => o.id === this.dairyitem.id));
                     const getalbum = await axios.get('api/albums/'+ response.data);
-                    this.dairies[objIndex].albums=getalbum.data;
-                    this.dairies[objIndex].album_id = response.data
+                    console.log(this.adddairy)
+                    if (this.adddairy === false) {
+                        console.log("here")
+                        this.dairies[objIndex].albums = getalbum.data;
+                        this.dairies[objIndex].album_id = response.data
+                    }
+                    else{
+                        this.addeddairy.albums = getalbum.data;
+                        this.addeddairy.album_id = response.data
+                    }
                     // const obj = this.dairies.find(o => {if (o.id === this.dairyitem.id)
                     // {
                     //     o.album_id
@@ -237,13 +219,12 @@ export default {
                     //
                     // }
                     // });
-                    console.log(this.dairies)
                     // const response2 = await axios.put('api/dairy/'+ this.dairyitem.id,
                     //     {
                     //         album_id :response.data
                     //     }
                     // );
-                        console.log()
+
                  //   this.dairyitem.albums=response.data
                   //  this.dairies.push(album)
                 }
@@ -272,7 +253,7 @@ export default {
 
             this.filter.page = page
            // this.showspinner = false
-            console.log(this.filter)
+
             const params = this.filter
 
             try{
@@ -301,7 +282,6 @@ export default {
 
        //     this.filter.page = this.page
             this.showspinner = false
-            console.log(this.filter)
             const params = this.filter
 
             try{
@@ -313,26 +293,24 @@ export default {
             catch(e){
                 alert(e);
             }
-            console.log(this.dairies)
         },
         removeAlbum(album){
-            console.log("pressed")
             this.showdialog = true;
             this.deletealbum = album
             //this.dairies=this.dairies.filter(p => p.id !== album.id);
         },
         loadMorePosts(){
-            console.log("222")
             this.fetchDairies()
         },
         async updateAlbum(dairy){
             const newar = [];
          //   dairy.artists.forEach(element => newar.push(element.name));
-            console.log(dairy);
+
             try{
                 const response = await axios.put('api/dairy/' + dairy.id,
                     {
-                        artists: newar,
+                     //
+                        //  artists: newar,
                         name: dairy.name,
                         score: dairy.score,
                         experience: dairy.experience,
@@ -354,7 +332,6 @@ export default {
             }
         },
         async deleteAlbum(album){
-            console.log(album)
             try{
                 const response = await axios.delete('api/dairy/' + album.id);
                 if (response.status === 200) {
@@ -393,7 +370,5 @@ export default {
 .observer{
     height:30px;
 }
-.choosed{
-    background-color: green;
-}
+
 </style>

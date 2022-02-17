@@ -18,7 +18,7 @@ class Dairy extends Model
         "description"
     ];
 
-    protected $hidden = ["created_at", "updated_at", "album_id"];
+    protected $hidden = ["created_at", "updated_at"];
 
     public function albums()
     {

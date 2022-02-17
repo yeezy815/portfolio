@@ -88,7 +88,7 @@ export default {
                 score: '',
                 experience: '',
                 description: '',
-                album_id: null,
+                album_id: 0,
                 albums:{}
             },
             required: false

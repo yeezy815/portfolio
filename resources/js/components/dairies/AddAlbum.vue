@@ -3,7 +3,8 @@
         <div class="row mx-auto w-50">
             <div class="row">
                 <div class="col w-25">
-                    <button  class="btn btn-info w-100 mb-1" @click="$emit('selectalbum')">
+<!--                    $emit('selectalbum')-->
+                    <button  class="btn btn-info w-100 mb-1" @click="test = true">
                         выбрать существующий альбом
                     </button>
                 </div>
@@ -23,15 +24,23 @@
                 </div>
             </div>
         </div>
-    </my-dialog>
 
+    </my-dialog>
 </template>
 
 <script>
 import MyDialog from "@/components/UI/MyDialog";
+import CreateAlbum from "@/components/dairies/CreateAlbum";
+import AlbumItem from "@/components/albums/AlbumItem";
 export default {
     name: "AddAlbum",
-    components: {MyDialog}
+    components: {AlbumItem, CreateAlbum, MyDialog},
+
+    data(){
+    return{
+            test: false
+        }
+    }
 }
 </script>
 
