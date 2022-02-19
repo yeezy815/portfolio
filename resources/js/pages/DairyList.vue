@@ -7,6 +7,7 @@
                     @remove="removeAlbum"
                     @confirm="updateAlbum"
                     @editalbum="editAlbum"
+                    @cancel="cancelEdit"
         />
     </div>
     <div class="spinner-border" role="status" v-if="showspinner"><span class="visually-hidden">Loading...</span>  </div>
@@ -20,7 +21,7 @@
     </my-dialog>
 
 
-    <my-dialog v-if="adddairy" @close="adddairy = false">
+    <my-dialog v-show="adddairy" @close="adddairy = false">
         <dairy-item
             :dairy="addeddairy"
             :creation="true"
@@ -72,7 +73,7 @@ import {vModelSelect} from "vue";
 export default {
     name: "AlbumList.vue",
 
-    emits: ["remove", "confirm", "cancel", "close", "selectalbum", "createalbum", "setAlbum"],
+    emits: ["remove", "confirm", "cancel", "close", "selectalbum", "createalbum", "setAlbum", "filter"],
     components: {
         SelectAlbum,
         CreateAlbum, AddAlbum, DairyItem, CreateForm, SelectBar, DeleteConfirm, AlbumItem, MyDialog, AlbumList},
@@ -153,6 +154,7 @@ export default {
             }
         },
         filterAlbums(filter){
+            console.log(filter)
             this.filter = filter
             this.albums = []
             this.page = 0
@@ -186,6 +188,7 @@ export default {
         async addAlbum(album)
         {
             console.log(album)
+
             const newar = [];
             album.artists.forEach(element => newar.push(element.name));
             try{
@@ -241,9 +244,9 @@ export default {
         },
         async fetchAlbums(page = 1){
             // filter = null
-
+            console.log(this.filter)
             this.page+=1
-            if (this.filter !== null) {
+            if (this.filter ) {
                 Object.keys(this.filter).forEach(key => {
                     if (this.filter[key] === null || this.filter[key] === '') {
                         delete this.filter[key];
@@ -330,6 +333,11 @@ export default {
             catch(e){
                 alert(e);
             }
+        },
+        cancelEdit(ActualDairyVal){
+            const objIndex = this.dairies.findIndex((o => o.id === ActualDairyVal.id))
+            this.dairies[objIndex]=ActualDairyVal
+
         },
         async deleteAlbum(album){
             try{

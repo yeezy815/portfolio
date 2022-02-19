@@ -60,8 +60,8 @@
 
 
             <div class="buttons" v-if="edit || creation ">
-                <button @click="edit = false ; $emit('confirm', dairy)" class="btn btn-success">Сохранить</button>
-                <button class="btn btn-secondary" @click="edit = false">Отменить</button>
+                <button @click="save" class="btn btn-success">Сохранить</button>
+                <button class="btn btn-secondary" @click="cancel">Отменить</button>
 
                 <p v-if="updatestatus" >{{updatestatus}}</p>
             </div>
@@ -79,6 +79,24 @@ export default {
     name: "DairyItem",
     emits: ['remove', 'confirm', 'cancel', 'editalbum'],
     components: {MyInput, AlbumArtist},
+    data(){
+        return{
+            hover: false,
+            updatestatus:"",
+            buttons:false,
+            edit: false,
+            defaultItem: {
+                id: Date.now(),
+                date: '',
+                score: '',
+                experience: '',
+                description: '',
+                album_id: null,
+                albums:{}
+            }
+
+        }
+    },
     props:{
       dairy:{
             type: Object,
@@ -88,7 +106,7 @@ export default {
                 score: '',
                 experience: '',
                 description: '',
-                album_id: 0,
+                album_id: null,
                 albums:{}
             },
             required: false
@@ -101,21 +119,62 @@ export default {
             default: false
         }
     },
-    data(){
-        return{
-            hover: false,
-            updatestatus:"",
-            buttons:false,
-            edit: false
 
+
+    watch:{
+        edit(newVal){
+            console.log("in")
+            if (newVal){
+
+                console.log(this.dairy)
+                for (let key in this.dairy) {
+                    this.defaultItem[key] = this.dairy[key];
+                }
+               // this.defaultItem = this.dairy
+            }
         }
     },
+
     mounted() {
-        if (this.creation === true)
+        if (this.creation === true){
+            console.log(this.dairy.default)
+            for (let key in this.defaultItem) {
+                this.dairy[key] =  this.defaultItem[key];
+            }
+            this.defaultItem = {} //this.dairy
             this.edit = true
+        }
+
+
     },
     methods:{
+        save(){
+            this.$emit('confirm', this.dairy)
+            if (!this.creation)
+            {
+                this.edit = false ;
 
+            }
+            else{
+                for (let key in this.defaultItem)
+                    this.dairy[key] = this.defaultItem[key]
+            }
+
+
+
+        },
+        cancel(){
+            console.log(this.$props.dairy)
+            for (let key in this.defaultItem)
+                this.dairy[key] = this.defaultItem[key]
+            if (!this.creation)
+                 this.edit = false
+            else {
+                this.$emit('cancel')
+                }
+
+           // this.$emit('cancel', this.defaultItem)
+        },
         showButtons(){
             this.buttons = true;
         },

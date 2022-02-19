@@ -22,11 +22,6 @@ export default {
             show: true
         }
     },
-    methods: {
-        test(){
-            console.log("qqqqq")
-        }
-    }
 }
 </script>
 

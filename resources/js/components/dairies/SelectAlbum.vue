@@ -1,7 +1,7 @@
 <template>
     <my-dialog  @close="$emit('close')">
         <select-bar
-            @filter="$emit('filter')"/>
+            @filter="filterAlbums"/>
         <div style="width:80%">
             <div style="margin-bottom: 5px"
                  v-for="album in albums"
@@ -29,7 +29,7 @@ import MyDialog from "@/components/UI/MyDialog";
 import SelectBar from "@/components/albums/SelectBar";
 export default {
     name: "SelectAlbum",
-    emits: ['changePage', 'setAlbum'],
+    emits: ['changePage', 'setAlbum', 'filter'],
     components: {SelectBar, MyDialog},
     props: {
         albums: {
@@ -37,6 +37,11 @@ export default {
         },
         albumSettings:{
             type: Object
+        }
+    },
+    methods:{
+        filterAlbums(filter){
+            this.$emit('filter', filter);
         }
     },
     mounted() {
