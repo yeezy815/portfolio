@@ -2,7 +2,7 @@
     <my-dialog  @close="$emit('close')">
         <div class="container justify-content-md-center" >
             <album-item @confirm="addAlbum"
-                        @cancel="$emit('cancel')"
+                        @cancel="$emit('close')"
                         :creation="true"
             />
         </div>
@@ -14,7 +14,7 @@ import MyDialog from "@/components/UI/MyDialog";
 import AlbumItem from "@/components/albums/AlbumItem";
 export default {
     name: "CreateAlbum",
-    emits: ['confirm', 'cancel'],
+    emits: ['confirm', 'close'],
     components: {AlbumItem, MyDialog},
     methods:{
       addAlbum(album){
