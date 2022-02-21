@@ -4,12 +4,12 @@
     </div>
     <select-bar
         @filter="filterAlbums"/>
-    <my-dialog v-if="showdialog">
+    <my-dialog v-if="showdialog" @close="showdialog = false">
         <delete-confirm :album = "deletealbum" @cancel="showdialog = false"
                         :message=" 'удалить альбом ' + deletealbum.name + '?' "
                         @confirm="deleteAlbum(deletealbum)"/>
     </my-dialog>
-    <my-dialog v-if="addalbum" >
+    <my-dialog v-if="addalbum" @clos="addalbum = false">
         <div class="container justify-content-md-center" >
             <album-item @confirm="addAlbum"
                         @cancel="addalbum = false"
@@ -19,6 +19,7 @@
     </my-dialog>
     <div class="album-list" >
         <album-item
+            :key="album.id"
             v-for="album in albums"
             :album="album"
             @remove="removeAlbum"
@@ -39,13 +40,33 @@ import MyDialog from "@/components/UI/MyDialog";
 import DeleteConfirm from "@/components/albums/DeleteConfirm";
 import SelectBar from "@/components/albums/SelectBar";
 import CreateForm from "@/components/albums/CreateForm";
+import useAlbums from "@/composables/albums";
+import {onMounted} from "vue";
 export default {
     name: "AlbumList.vue",
     emits: ["remove", "confirm", "cancel"],
     components: {CreateForm, SelectBar, DeleteConfirm, AlbumItem, MyDialog},
+    setup(){
+        const { albums, getAlbums, destroyAlbum, updateAlbum, createAlbum} = useAlbums()
+
+
+        onMounted(getAlbums)
+
+
+
+
+
+        return {
+            albums,
+            getAlbums,
+            destroyAlbum,
+            updateAlbum,
+            createAlbum
+        }
+    },
     data(){
         return{
-            albums:[],
+          //  albums:[],
             showdialog: false,
             deletealbum: {},
             addalbum: false,
@@ -56,132 +77,33 @@ export default {
     },
 
     methods:{
-        search(filter){
-            console.log(filter)
-        },
         filterAlbums(filter){
+            console.log(filter)
             this.filter = filter
             this.albums = []
             this.page = 0
+           // this.getAlbums(filter, this.page)
             this.showspinner = true
-            this.fetchAlbums()
         },
-        async addAlbum(album)
+        addAlbum(album)
         {
-            const newar = [];
-            album.artists.forEach(element => newar.push(element.name));
-            console.log(album);
-            try{
-                const response = await axios.post('api/albums/',
-                    {
-                        artists: newar,
-                        name: album.name,
-                        year: album.year,
-
-                    }
-
-                );
-
-                if (response.status === 200){
-                    this.addalbum = false
-                    this.albums.push(album)
-                }
-                //     this.updatestatus = "данные успешно обновлены";
-                // else
-                //     this.updatestatus = "не удалось обновить данные";
-                // this.buttons = false;
-                console.log( response);
-
-            }
-            catch(e){
-                alert(e);
-            }
-        },
-        async fetchAlbums(){
-            // filter = null
-
-            this.page+=1
-            if (this.filter !== null) {
-                Object.keys(this.filter).forEach(key => {
-                    if (this.filter[key] === null || this.filter[key] === '') {
-                        delete this.filter[key];
-                    }
-                });
-            }
-
-            this.filter.page = this.page
-            this.showspinner = false
-            console.log(this.filter)
-            const params = this.filter
-
-            try{
-                const response = await axios.get('api/albums', {params: params} );
-                //       this.albums = response.data.data;
-                this.albums=[...this.albums,...response.data.data];
-
-            }
-            catch(e){
-                alert(e);
-            }
+            this.createAlbum(album)
+            this.addalbum = false
         },
         removeAlbum(album){
             this.showdialog = true;
             this.deletealbum = album
-            //this.albums=this.albums.filter(p => p.id !== album.id);
         },
         loadMorePosts(){
-            console.log("222")
-            this.fetchAlbums()
-        },
-        async updateAlbum(album){
-            const newar = [];
-            album.artists.forEach(element => newar.push(element.name));
-            console.log(newar);
-            try{
-                const response = await axios.put('api/albums/' + album.id,
-                    {
-                        artists: newar,
-                        name: album.name,
-                        year: album.year,
-
-                    }
-                );
-                // if (response.status === 200)
-                //     this.updatestatus = "данные успешно обновлены";
-                // else
-                //     this.updatestatus = "не удалось обновить данные";
-                // this.buttons = false;
-                console.log( response);
-
-            }
-            catch(e){
-                alert(e);
-            }
+            this.page++
+            this.getAlbums(this.filter, this.page)
         },
         async deleteAlbum(album){
-            console.log(album)
-            try{
-                const response = await axios.delete('api/albums/' + album.id);
-                if (response.status === 200) {
-                    this.updatestatus = "данные успешно обновлены";
-                    this.buttons = false;
-                    this.albums=this.albums.filter(p => p.id !== album.id);
-                    this.deletealbum = null
-                    //this.$emit('remove',this.album);
-                }
-                else
-                    this.updatestatus = "не удалось обновить данные";
-
-
-            }
-            catch(e){
-                alert(e);
-            }
+            this.destroyAlbum(album)
+            this.buttons = false;
+            this.deletealbum = null
             this.showdialog = false;
         },
-    },
-    mounted() {
-        //  this.fetchAlbums()
     },
 }
 </script>

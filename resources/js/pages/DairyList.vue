@@ -84,6 +84,7 @@ export default {
 
         return {
           dairies,
+
          deleteDairy,
             putDairy,
             addDairy
@@ -92,8 +93,6 @@ export default {
 
     data(){
         return{
-      //      dairies:[],
-      //      dairies:[],
             addeddairy: {},
             showdialog: false,
             deletealbum: {},
