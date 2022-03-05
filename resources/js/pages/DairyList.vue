@@ -16,7 +16,8 @@
         <button type="button" class="btn btn-info" @click="adddairy= true">добавить запись</button>
     </div>
     <my-dialog v-if="showdialog">
-        <delete-confirm :message="'удалить запись от '+ deletealbum.date" @cancel="showdialog = false"
+        <delete-confirm :message="'удалить запись от '+ deletealbum.date"
+                        @cancel="showdialog = false"
                         @confirm="deleteAlbum(deletealbum)"/>
     </my-dialog>
 
@@ -36,12 +37,7 @@
     <attach-album
         v-show="editalbum"
         @close="editalbum=false"
-        @createAlbum="addAlbum"
-        :albums="albums"
-        :album-settings="albumSettings"
-        @filter="filterAlbums"
         @setAlbum="setAlbum"
-        @changePage="fetchAlbums"
     />
 </template>
 
@@ -84,7 +80,6 @@ export default {
 
         return {
           dairies,
-
          deleteDairy,
             putDairy,
             addDairy
@@ -97,16 +92,10 @@ export default {
             showdialog: false,
             deletealbum: {},
             adddairy: false,
-            page: 0,
             filter: {},
-            albums: [],
             showspinner : true,
             editalbum: false,
             dairyitem:{},
-            albumSettings: {
-                currentPage: 1,
-                totalPages: 0
-            }
         }
     },
     methods:{
@@ -121,99 +110,18 @@ export default {
             this.adddairy = false
             this.addDairy(dairy)
         },
-        filterAlbums(filter){
-            console.log(filter)
-            this.filter = filter
-            this.albums = []
-            this.page = 0
-            this.showspinner = true
-            this.fetchAlbums()
-        },
         async setAlbum(album){
-            console.log(album)
-            try {
-                     const objIndex = this.dairies.findIndex((o => o.id === this.dairyitem.id));
-                if (!this.adddairy) {
-                    this.dairies[objIndex].albums = album
-                    this.dairies[objIndex].album_id = album.id
-                }
-                else {
-                    this.addeddairy.albums = album
-                    this.addeddairy.album_id = album.id
-                }
-                this.editalbum = false
+            const objIndex = this.dairies.findIndex((o => o.id === this.dairyitem.id));
+            if (!this.adddairy) {
+                this.dairies[objIndex].albums = album
+                this.dairies[objIndex].album_id = album.id
             }
-            catch (e){
-                console.log(e)
+            else {
+                this.addeddairy.albums = album
+                this.addeddairy.album_id = album.id
             }
-        },
-        async addAlbum(album)
-        {
-            console.log(album)
+            this.editalbum = false
 
-            const newar = [];
-            album.artists.forEach(element => newar.push(element.name));
-            try{
-                const response = await axios.post('api/albums/',
-                    {
-                        artists: newar,
-                        name: album.name,
-                        year: album.year,
-                    }
-
-                );
-
-                if (response.status === 200){
-                    const objIndex = this.dairies.findIndex((o => o.id === this.dairyitem.id));
-                    const getalbum = await axios.get('api/albums/'+ response.data);
-                    console.log(this.adddairy)
-                    if (this.adddairy === false) {
-                        console.log("here")
-                        this.dairies[objIndex].albums = getalbum.data;
-                        this.dairies[objIndex].album_id = response.data
-                    }
-                    else{
-                        this.addeddairy.albums = getalbum.data;
-                        this.addeddairy.album_id = response.data
-                    }
-
-                }
-                //     this.updatestatus = "данные успешно обновлены";
-                // else
-                //     this.updatestatus = "не удалось обновить данные";
-                // this.buttons = false;
-                console.log( response);
-
-            }
-            catch(e){
-                alert(e);
-            }
-        },
-        async fetchAlbums(page = 1){
-
-            if (this.filter ) {
-                Object.keys(this.filter).forEach(key => {
-                    if (this.filter[key] === null || this.filter[key] === '') {
-                        delete this.filter[key];
-                    }
-                });
-            }
-
-            this.filter.page = page
-           // this.showspinner = false
-            const params = this.filter
-
-            try{
-                const response = await axios.get('api/albums', {params: params} );
-                //       this.albums = response.data.data;
-                this.albums=response.data.data //[...this.albums,...response.data.data];
-                console.log(response.data);
-                this.albumSettings.totalPages = response.data.last_page
-                this.albumSettings.currentPage =  response.data.current_page
-            }
-            catch(e){
-                alert(e);
-            }
         },
         async fetchDairies(){
             if (this.filter !== null) {
@@ -223,14 +131,11 @@ export default {
                     }
                 });
             }
-
-       //     this.filter.page = this.page
             this.showspinner = false
             const params = this.filter
 
             try{
                 const response = await axios.get('api/dairy', {params: params} );
-                //       this.dairies = response.data.data;
                 this.dairies=[...this.dairies,...response.data];
 
             }
@@ -241,7 +146,6 @@ export default {
         removeAlbum(album){
             this.showdialog = true;
             this.deletealbum = album
-            //this.dairies=this.dairies.filter(p => p.id !== album.id);
         },
         loadMorePosts(){
          //   this.fetchDairies()

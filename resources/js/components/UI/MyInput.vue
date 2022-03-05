@@ -24,11 +24,12 @@ export default {
 /*}*/
 .input{
     background: none;
-    height: 100%;
+    height: 50px;
     width: 100%;
-    border: 0;
     font-size: 15px;
     outline:none;
+    border-width: 0 0 2px;  border-color: #G7G7G7;
+
     display: inline-block;
 }
 </style>

@@ -4,7 +4,6 @@
         <div class="row mx-auto w-50">
             <div class="row">
                 <div class="col w-25" >
-<!--                   -->
                     <button  class="btn btn-info w-100 mb-1" @click="showSelectAlbum = true">
                         выбрать существующий альбом
                     </button>
@@ -28,20 +27,15 @@
     </my-dialog>
 
         <create-album
-            v-show="showCreateAlbum"
+            v-if="showCreateAlbum"
             @close="showCreateAlbum = false"
-            @cancel="showCreateAlbum = false"
-            @confirm="createAlbum"
+            @confirm="setAlbum"
         />
 
         <select-album
             v-if="showSelectAlbum"
-            :albums="albums"
-            :album-settings="albumSettings"
             @close="showSelectAlbum= false"
-            @filter="filterAlbums"
             @setAlbum="setAlbum"
-            @changePage="changePage"
         />
 </div>
 </template>
@@ -56,6 +50,9 @@ export default {
     name: "AttachAlbum",
     components: {AlbumItem, CreateAlbum, MyDialog, DairyItem, SelectAlbum},
     emits: ['close', 'confirm', 'cancel', 'fetchAlbums', 'createAlbum', 'setAlbum', 'filter', 'changePage'],
+
+
+
     data(){
         return{
             showCreateAlbum: false,
@@ -66,21 +63,17 @@ export default {
         albums:{type: Array},
         albumSettings: {type: Object}
     },
+
+
     methods:{
         createAlbum(album){
            this.$emit('createAlbum',album);
            this.showCreateAlbum = false;
            this.$emit('close')
         },
-        filterAlbums(filter){
-            this.$emit('filter', filter)
-        },
         setAlbum(album){
             this.$emit('setAlbum', album)
         },
-        changePage(page){
-            this.$emit('changePage', page)
-        }
     }
 
 }

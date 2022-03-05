@@ -1,7 +1,7 @@
 <template>
     <my-dialog  @close="$emit('close')">
         <div class="container justify-content-md-center" >
-            <album-item @confirm="addAlbum"
+            <album-item @confirm="getCreatedItem"
                         @cancel="$emit('close')"
                         :creation="true"
             />
@@ -12,17 +12,29 @@
 <script>
 import MyDialog from "@/components/UI/MyDialog";
 import AlbumItem from "@/components/albums/AlbumItem";
+import useAlbums from "@/composables/albums";
+
+
 export default {
     name: "CreateAlbum",
-    emits: ['confirm', 'close'],
-    components: {AlbumItem, MyDialog},
-    methods:{
-      addAlbum(album){
+    emits: ['confirm', 'cancel'],
+    setup(props, {emit}){
+        const {  createAlbum, createdItemId, getAlbums,albums} = useAlbums()
 
-            this.$emit('confirm',album)
-         // this.$emit('close');
+        const getCreatedItem = async (album) => {
+             await createAlbum(album)
+             emit('confirm',albums.value[0])
+             emit('close')
         }
-    }
+
+        return {
+            createAlbum,
+            createdItemId,
+            getCreatedItem,
+            albums
+        }
+    },
+    components: {AlbumItem, MyDialog},
 }
 </script>
 

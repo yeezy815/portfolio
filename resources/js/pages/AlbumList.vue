@@ -9,7 +9,7 @@
                         :message=" 'удалить альбом ' + deletealbum.name + '?' "
                         @confirm="deleteAlbum(deletealbum)"/>
     </my-dialog>
-    <my-dialog v-if="addalbum" @clos="addalbum = false">
+    <my-dialog v-if="addalbum" @close="addalbum = false">
         <div class="container justify-content-md-center" >
             <album-item @confirm="addAlbum"
                         @cancel="addalbum = false"

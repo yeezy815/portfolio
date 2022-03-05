@@ -1,35 +1,40 @@
 <template>
     <div class="album-item d-flex align-items-center justify-content-center">
-        <div class="row  align-middle" style=" min-height: 75px; width: 98%;  "
-    @click = "buttons = true"
-
-     @mouseover="hover = true"
-     @mouseleave="hover = false"
->
-        <div class="col-3 " >
-            <album-artist :artists="album.artists" @remove="deleteArtist"/>
+        <div class="row  align-middle"
+             style=" min-height: 75px; width: 98%;  "
+             @click = "buttons = true"
+             @mouseover="hover = true"
+             @mouseleave="hover = false"
+        >
+            <div class="col-3 " >
+                <album-artist :artists="album.artists" :edit="edit" @remove="deleteArtist"/>
+            </div>
+            <div class="col" >
+                <a :href="'/albums/' + album.id"
+                   v-if="!edit"
+                   class="item-link"
+                >
+                    <p >{{album.name}}</p></a>
+                <my-input v-else v-model="album.name" placeholder="альбом"/>
+            </div>
+            <div class="col-1" >
+                <p  class="year"  >Год:
+                    <my-input v-if="edit" v-model="album.year" placeholder="год" />
+                    <span v-else>{{album.year}}</span>
+                </p>
+            </div>
+            <div class="col-1" >
+                <button type="button" class="btn btn-danger w-100" v-show="hover"  v-if="!creation"
+                @click="removeAlbum()"
+                >Удалить</button>
+                <button type="button" class="btn btn-info w-100" v-show="hover" @click="edit = true">Изменить</button>
+            </div>
+            <div class="buttons" v-show="edit">
+                <button @click="$emit('confirm', album); edit= false" class="btn btn-success">Сохранить</button>
+                <button class="btn btn-secondary" @click="cancel">Отменить</button>
+                <p v-if="updatestatus" >{{updatestatus}}</p>
+            </div>
         </div>
-        <div class="col" >
-    <!--     <p>Альбом:</p> -->
-            <my-input v-model="album.name" placeholder="альбом"/>
-        </div>
-        <div class="col-1" >
-            <p  class="year"  >Год: <my-input v-model="album.year" placeholder="год" /></p>
-        </div>
-        <div class="col-1" >
-            <button type="button" class="btn btn-danger" v-show="hover"  v-if="!creation"
-            @click="removeAlbum()"
-
-            >Удалить</button>
-        </div>
-        <div class="buttons" v-if="buttons ">
-            <button @click="$emit('confirm', album)" class="btn btn-success">Сохранить</button>
-            <button class="btn btn-secondary" @click="$emit('cancel')">Отменить</button>
-
-        <p v-if="updatestatus" >{{updatestatus}}</p>
-
-     </div>
-</div>
     </div>
 </template>
 
@@ -52,9 +57,6 @@ export default {
             },
             required: false
         },
-        // buttons:{
-        //     default:false
-        // },
         creation:{
             type: Boolean,
             default: false
@@ -65,12 +67,18 @@ export default {
             hover: false,
             updatestatus:"",
             buttons:false,
+            edit: false,
+            defaultItem:{
+                artists:{},
+                name: '',
+                year: 0
+            }
 
         }
     },
     mounted() {
         if (this.creation === true)
-            this.buttons = true
+            this.edit = true
     },
     methods:{
 
@@ -78,26 +86,35 @@ export default {
             this.buttons = true;
         },
         async removeAlbum(){
-
-            try{
-            //   const response = await axios.delete('api/albums/' + this.album.id);
-            //   if (response.status === 200) {
-                    this.updatestatus = "данные успешно обновлены";
-                    this.$emit('remove',this.album);
-            //   }
-            //   else
-              //      this.updatestatus = "не удалось обновить данные";
-                this.buttons = false;
-
-            }
-            catch(e){
-                alert(e);
-            }
+            this.updatestatus = "данные успешно обновлены";
+            this.$emit('remove',this.album);
+            this.buttons = false;
         },
         deleteArtist(artist){
             this.album.artists=this.album.artists.filter(p => p.id !== artist.id);
         },
-    }
+        cancel(){
+            for (let key in this.defaultItem)
+                this.album[key] = this.defaultItem[key]
+            if (!this.creation)
+                this.edit = false
+            else {
+                this.$emit('cancel')
+            }
+        },
+    },
+
+    watch:{
+        edit(newVal){
+            if (newVal){
+                for (let key in this.album) {
+                    this.defaultItem[key] = this.album[key];
+                }
+            }
+        }
+    },
+
+
 }
 </script>
 
@@ -126,6 +143,15 @@ export default {
 .year input{
     width:60px
 }
+
+.item-link{
+    color: black;
+    text-decoration:none
+}
+
+.item-link:hover{
+    color: #f7f7f7}
+
 .data-list{
     display: inline-block;
     width: 25%;

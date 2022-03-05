@@ -164,7 +164,6 @@ export default {
 
         },
         cancel(){
-            console.log(this.$props.dairy)
             for (let key in this.defaultItem)
                 this.dairy[key] = this.defaultItem[key]
             if (!this.creation)

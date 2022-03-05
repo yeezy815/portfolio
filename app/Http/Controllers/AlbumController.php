@@ -8,6 +8,13 @@ use Illuminate\Http\Request;
 
 class AlbumController extends Controller
 {
+    /**
+     * Shows all or filtered albums.
+     *
+     *
+     * @param Request $request
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     */
     public function index(Request $request)
     {
         $request->validate([
@@ -36,6 +43,13 @@ class AlbumController extends Controller
         $sortorder = $request->sortorder ?? 'asc';
         return $album->with('artists')->OrderBy($order, $sortorder)->paginate(10);
     }
+
+
+    /**
+     * Creates an albums.
+     * @param Request $request
+     * @return mixed
+     */
 
     public function store(Request $request)
     {

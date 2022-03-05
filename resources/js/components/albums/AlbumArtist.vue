@@ -3,9 +3,11 @@
 <!--        <p>Исполнитель: </p>-->
         <div v-for="artist in artists">
             <artist-item :artist="artist"
+                         :edit="edit"
             @remove="$emit('remove', artist)"/>
+            <span v-if="!edit && artist !== artists[artists.length - 1]">, &nbsp;</span>
         </div>
-        <button class="btn btn-secondary" @click="addArtist" v-if="showaddbutton">+</button>
+        <button class="btn btn-secondary" @click="addArtist" v-show="showaddbutton && edit">+</button>
     </div>
 <!--    <button v-if="showbutton">+</button>-->
 </template>
@@ -21,12 +23,16 @@ export default {
             type:Array,
             required: false
         },
+        edit:{
+            type: Boolean,
+            default: true
+        }
     },
 
     data(){
         return{
             showaddbutton: false,
-            edit: false,
+          //  edit: false,
 
         }
     },

@@ -4,7 +4,11 @@ export default function useAlbums(){
 
     let albums =ref([])
 
-    let page = 0
+    let currentPage = ref(0)
+
+    let lastPage = ref(0)
+
+    let createdItemId = ref(0)
 
     const headers = {
         header: {
@@ -22,6 +26,7 @@ export default function useAlbums(){
                 }
             });
             filter.page = page
+            albums.value = []
         }
         else {
             filter = {}
@@ -31,6 +36,9 @@ export default function useAlbums(){
             params: filter,
             headers: headers
         })
+        console.log(response.data.last_page)
+        lastPage.value = response.data.last_page
+        currentPage.value = response.data.current_page
         albums.value = [...albums.value, ...response.data.data]
     }
 
@@ -57,14 +65,20 @@ export default function useAlbums(){
             name: albumItem.name,
             year: albumItem.year,
         }
-        await  axios.post('/api/albums/', data, headers)
+       await  axios.post('/api/albums/', data, headers).then(
+            response => (createdItemId = response.data)
+        )
         albums.value.push(albumItem)
+      // createdItemId = response.data
     }
 
 
 
     return{
         albums,
+        lastPage,
+        currentPage,
+        createdItemId,
         getAlbums,
         destroyAlbum,
         updateAlbum,
