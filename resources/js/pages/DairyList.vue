@@ -2,6 +2,7 @@
     <div class="article">
         <p> Записи </p>
     </div>
+    {{test}}
     <div class="album-list" >
         <dairy-item v-for="dairy in dairies" :dairy="dairy"
                     @remove="removeAlbum"
@@ -11,7 +12,8 @@
         />
     </div>
     <div class="spinner-border" role="status" v-if="showspinner"><span class="visually-hidden">Loading...</span>  </div>
-    <div   v-intersection="loadMorePosts" class="observer"></div>
+<!--    <div   v-intersection="getDairies" class="observer"></div>-->
+    <button   @click="getDairies(filter)">Загрузить еще</button>
     <div class="fixed-bottom" style="margin: 0 auto; width: 150px; margin-bottom: 10px">
         <button type="button" class="btn btn-info" @click="adddairy= true">добавить запись</button>
     </div>
@@ -64,7 +66,7 @@ export default {
       const { dairies, getDairies, destroyDairy, updateDairy, createDairy} = useDairies()
 
 
-        onMounted(getDairies)
+         onMounted(getDairies)
 
         const deleteDairy = async (dairy) => {
           await destroyDairy(dairy)
@@ -78,8 +80,12 @@ export default {
             await createDairy(dairy)
         }
 
+        let test = dairies
+
         return {
           dairies,
+            test,
+        getDairies,
          deleteDairy,
             putDairy,
             addDairy
@@ -92,7 +98,7 @@ export default {
             showdialog: false,
             deletealbum: {},
             adddairy: false,
-            filter: {},
+            filter: null,
             showspinner : true,
             editalbum: false,
             dairyitem:{},
@@ -103,7 +109,6 @@ export default {
             {
                 this.editalbum = true
                 this.dairyitem = dairy
-                console.log(dairy)
             },
         async newDairy(dairy)
         {
@@ -122,26 +127,6 @@ export default {
             }
             this.editalbum = false
 
-        },
-        async fetchDairies(){
-            if (this.filter !== null) {
-                Object.keys(this.filter).forEach(key => {
-                    if (this.filter[key] === null || this.filter[key] === '') {
-                        delete this.filter[key];
-                    }
-                });
-            }
-            this.showspinner = false
-            const params = this.filter
-
-            try{
-                const response = await axios.get('api/dairy', {params: params} );
-                this.dairies=[...this.dairies,...response.data];
-
-            }
-            catch(e){
-                alert(e);
-            }
         },
         removeAlbum(album){
             this.showdialog = true;

@@ -13,13 +13,16 @@
 import MyDialog from "@/components/UI/MyDialog";
 import AlbumItem from "@/components/albums/AlbumItem";
 import useAlbums from "@/composables/albums";
+import {onMounted} from "vue";
 
 
 export default {
     name: "CreateAlbum",
     emits: ['confirm', 'cancel'],
     setup(props, {emit}){
-        const {  createAlbum, createdItemId, getAlbums,albums} = useAlbums()
+        const {  createAlbum,items, setItemType} = useAlbums()
+
+        let albums=items
 
         const getCreatedItem = async (album) => {
              await createAlbum(album)
@@ -27,9 +30,15 @@ export default {
              emit('close')
         }
 
+        onMounted(()=>{
+            setItemType('album')
+        })
+
+
+
+
         return {
             createAlbum,
-            createdItemId,
             getCreatedItem,
             albums
         }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\DairyRequest;
 use App\Models\Dairy;
 use Illuminate\Http\Request;
 
@@ -14,7 +15,7 @@ class DairyController extends Controller
      */
     public function index()
     {
-        return Dairy::with('albums')->get();
+        return Dairy::with('albums')->paginate(10);
     }
 
     /**
@@ -23,9 +24,9 @@ class DairyController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(DairyRequest $request)
     {
-        return Dairy::create($request->all());
+       Dairy::create($request->validated());
     }
 
     /**
@@ -46,11 +47,10 @@ class DairyController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(DairyRequest $request, $id)
     {
         $dairy = Dairy::findOrFail($id);
-        $dairy->update($request->all());
-        return $dairy;
+        return $dairy->update($request->validated());
     }
 
     /**

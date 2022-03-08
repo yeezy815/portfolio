@@ -2,7 +2,18 @@ import {ref} from 'vue';
 
 export default function useAlbums(){
 
-    let albums =ref([])
+    let items =ref([])
+
+    let link = ref(new Map([
+                ['dairy','/api/dairies/'],
+                ['album', '/api/albums/']
+            ]
+        )
+    )
+
+    let itemType = ref('')
+
+    let itemLink = ref('')
 
     let currentPage = ref(0)
 
@@ -10,73 +21,75 @@ export default function useAlbums(){
 
     let createdItemId = ref(0)
 
+    let isLastPage = ref(false)
+
     const headers = {
         header: {
             'Accept': 'application/json'
         }
     }
-    const getAlbums = async (filter, page = 1) => {
-        console.log("pressed")
 
+    const setItemType = (sent) => {
+        itemType.value   = sent
+        itemLink.value = link.value.get(itemType.value)
+        console.log(link.value.get(itemType.value))
+    }
+
+    const getAlbums = async (filter) => {
         if (filter) {
-            // page+=1
             Object.keys(filter).forEach(key => {
                 if (filter[key] === null || filter[key] === '') {
                     delete filter[key];
                 }
             });
-            filter.page = page
-            albums.value = []
+             currentPage.value = 0
+            items.value = []
         }
         else {
             filter = {}
         }
-
-        let response = await  axios.get('/api/albums', {
+        filter.page = currentPage.value + 1
+        let response = await  axios.get(  itemLink.value, {
             params: filter,
             headers: headers
         })
-        console.log(response.data.last_page)
+
         lastPage.value = response.data.last_page
         currentPage.value = response.data.current_page
-        albums.value = [...albums.value, ...response.data.data]
+
+        isLastPage.value = currentPage.value === lastPage.value
+        if (itemType.value === "album") {
+            items.value = [...items.value, ...response.data.data]
+        }
+        else
+            console.log("no")
     }
 
     const destroyAlbum = async (albumItem) => {
-        await  axios.delete('/api/albums/'+albumItem.id, headers)
-        albums.value=albums.value.filter(p => p.id !== albumItem.id);
+        await  axios.delete(  itemLink.value +albumItem.id, headers)
+        items.value=items.value.filter(p => p.id !== albumItem.id);
     }
     const updateAlbum = async (albumItem) => {
-        const newar = [];
-        albumItem.artists.forEach(element => newar.push(element.name));
-        const data = {
-            artists: newar,
-            name: albumItem.name,
-            year: albumItem.year,
-        }
-        await  axios.put('/api/albums/'+albumItem.id, data, headers)
+        await  axios.put(  itemLink.value +albumItem.id, albumItem, headers)
     }
 
     const createAlbum = async (albumItem) => {
-        const newar = [];
-        albumItem.artists.forEach(element => newar.push(element.name));
-        const data = {
-            artists: newar,
-            name: albumItem.name,
-            year: albumItem.year,
-        }
-       await  axios.post('/api/albums/', data, headers).then(
-            response => (createdItemId = response.data)
+       await  axios.post(  itemLink.value , albumItem, headers).then(
+            response => (
+                items.value.push(response.data)
+            )
         )
-        albums.value.push(albumItem)
-      // createdItemId = response.data
     }
 
 
 
     return{
-        albums,
+        items,
         lastPage,
+        itemType,
+        setItemType,
+        link,
+        isLastPage,
         currentPage,
         createdItemId,
         getAlbums,

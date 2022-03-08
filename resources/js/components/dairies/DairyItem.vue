@@ -20,16 +20,22 @@
 
                 </div>
                 <div class="row" >
-                    <div class="col album-info" @click="$emit('editalbum',dairy)" >
+                    <div class="col album-info" @click="editAlbum" >
                         <div class="col" v-if="dairy.albums">
+
                             <p>Альбом:
-<!--                                <my-input v-if="edit" v-model="dairy.albums.name" placeholder="альбом" />-->
+                              <a :href="(!edit) ?'/api/albums/' + dairy.albums.id :null">
+
+
                                 <span >{{dairy.albums.name}}</span>
-                            </p></div>
+                              </a>
+                            </p>
+
+                        </div>
                         <div class="col" v-if="dairy.albums">
                             <span>Исполнитель:</span><br>
                             <span v-for="artist in dairy.albums.artists">
-                                {{artist.name}}
+                                <a :href="(!edit) ? '/api/artists/' + artist.id : null">    {{artist.name}} </a>
                                 <span v-if="artist.id !== dairy.albums.artists[dairy.albums.artists.length-1].id">, </span>
                             </span>
                             <!--                            <my-input v-model="dairy.albums.name" placeholder="оценка" />-->
@@ -196,6 +202,10 @@ export default {
         },
         deleteArtist(artist){
             this.album.artists=this.album.artists.filter(p => p.id !== artist.id);
+        },
+        editAlbum(){
+            if (this.edit)
+                this.$emit('editalbum',this.dairy)
         },
     }
 }

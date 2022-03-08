@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Album;
 use App\Models\Artist;
 use Illuminate\Http\Request;
-
+use App\Http\Requests\AlbumRequest;
 class AlbumController extends Controller
 {
     /**
@@ -37,71 +37,59 @@ class AlbumController extends Controller
         if (isset($request["max_year"]))
             $album = $album->where('year', '<=', $request["max_year"]);
 
-      //  $albums = $album->with('artists')->OrderBy('year')->get();
-      //  return $albums;
+
         $order = $request->sortBy ?? 'year';
         $sortorder = $request->sortorder ?? 'asc';
-        return $album->with('artists')->OrderBy($order, $sortorder)->paginate(10);
+        return $album->with('artists')->OrderBy($order, $sortorder)->paginate(25);
     }
 
 
     /**
-     * Creates an albums.
+     * Creates an album.
      * @param Request $request
      * @return mixed
      */
 
-    public function store(Request $request)
+
+
+
+
+
+    public function store(AlbumRequest $request)
     {
-        $request->validate([
-            //'artist' => 'required',
-            'name' => 'required',
-            'year' => 'required'
+       // $artists = AlbumController::findOrCreateArtists($request["artists"]);
+        $album =Album::create([
+            "name" => $request["name"],
+            "year" => $request["year"]
         ]);
-        $artists = [];
-
-//        $artists[] = Artist::firstOrCreate([
-//            'name' => $request->artists
-//        ])["id"];
-            $artists = [];
-        if ($request->artists)
-            foreach ($request->artists as $artist)
-            {
-                $artists[] = Artist::firstOrCreate([
-                    'name' => $artist
-                ])["id"];
-            }
-        $album =Album::create(["name" => $request["name"], "year" => $request["year"]]);
-            $album->artists()
-            ->sync($artists);
-
-        return $album->id;
-      // return $artist->albums()->syncWithoutDetaching($album);
-////        return $album->artists()->syncWithoutDetaching($artist); //attach($artist);
+        $album->artists()->sync($request["artists"]);
+        return Album::with('artists')->find($album["id"]);
     }
+
     public function show($id)
     {
         return Album::with('artists')->findOrFail($id);
     }
+
+
+
+
+
     public function destroy($id)
     {
         return Album::destroy($id);
     }
 
-    public function update(Request $request, $id)
+
+
+
+    public function update(AlbumRequest $request, $id)
     {
         $album = Album::findOrFail($id);
-        $artists = [];
-        print_r($request->artists);
-        if (!empty($request->artists)) {
-            foreach ($request->artists as $artist) {
-                $artists[] = Artist::firstOrCreate([
-                    'name' => $artist
-                ])["id"];
-            }
-        }
-        unset($request["artists"]);
-        $album->artists()->sync($artists);
-        $album->update($request->all());
+        $album->artists()->sync($request["artists"]);
+        return $album->update([
+            "name" => $request["name"],
+            "year" => $request["year"]
+        ]);
     }
 }

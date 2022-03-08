@@ -26,10 +26,13 @@
             @confirm="updateAlbum"
 
         />
-
     </div>
-    <div class="spinner-border" role="status" v-if="showspinner"><span class="visually-hidden">Loading...</span>  </div>
-    <div   v-intersection="loadMorePosts" class="observer"></div>
+
+    <div  v-if="!isLastPage">
+        <div class="spinner-border" role="status" ><span class="visually-hidden">Loading...</span>  </div>
+        <button   @click="loadMorePosts">Загрузить еще</button>
+    </div>
+<!--    <div   v-intersection="loadMorePosts" class="observer"></div>-->
     <div class="fixed-bottom" style="margin: 0 auto; width: 150px; margin-bottom: 10px">
         <button type="button" class="btn btn-info" @click="addalbum = true">добавить альбом</button></div>
 </template>
@@ -47,17 +50,18 @@ export default {
     emits: ["remove", "confirm", "cancel"],
     components: {CreateForm, SelectBar, DeleteConfirm, AlbumItem, MyDialog},
     setup(){
-        const { albums, getAlbums, destroyAlbum, updateAlbum, createAlbum} = useAlbums()
+        const { items, getAlbums, destroyAlbum, updateAlbum, createAlbum, isLastPage, setItemType} = useAlbums()
 
+        let albums=items
+         onMounted(()=>{
+             setItemType('album')
+             getAlbums()
 
-        onMounted(getAlbums)
-
-
-
-
+         })
 
         return {
             albums,
+            isLastPage,
             getAlbums,
             destroyAlbum,
             updateAlbum,
@@ -71,18 +75,17 @@ export default {
             deletealbum: {},
             addalbum: false,
             page: 0,
-            filter: {},
+            filter: null,
             showspinner : true
         }
     },
 
     methods:{
         filterAlbums(filter){
-            console.log(filter)
             this.filter = filter
             this.albums = []
             this.page = 0
-           // this.getAlbums(filter, this.page)
+            this.loadMorePosts()
             this.showspinner = true
         },
         addAlbum(album)
@@ -96,6 +99,7 @@ export default {
         },
         loadMorePosts(){
             this.page++
+            console.log(this.isLastPage)
             this.getAlbums(this.filter, this.page)
         },
         async deleteAlbum(album){
