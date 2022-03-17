@@ -4,37 +4,38 @@
     </div>
     <select-bar
         @filter="filterAlbums"/>
-    <my-dialog v-if="showdialog" @close="showdialog = false">
-        <delete-confirm :album = "deletealbum" @cancel="showdialog = false"
-                        :message=" 'удалить альбом ' + deletealbum.name + '?' "
-                        @confirm="deleteAlbum(deletealbum)"/>
+    <my-dialog v-if="showPopUp" @close="showPopUp = false">
+        <delete-confirm
+            :album = "deletingAlbum" @cancel="showPopUp = false"
+            :message=" 'удалить альбом ' + deletingAlbum.name + '?' "
+            @confirm="confirmAlbumDeletion(deletingAlbum)"
+        />
     </my-dialog>
-    <my-dialog v-if="addalbum" @close="addalbum = false">
+    <my-dialog v-if="showAddAlbum" @close="showAddAlbum = false">
         <div class="container justify-content-md-center" >
-            <album-item @confirm="addAlbum"
-                        @cancel="addalbum = false"
-                        :creation="true"
+            <album-item
+                @confirm="addAlbum"
+                @cancel="showAddAlbum = false"
+                :creation="true"
             />
         </div>
     </my-dialog>
-    <div class="album-list" >
+    <div class="item-list" >
         <album-item
             :key="album.id"
             v-for="album in albums"
             :album="album"
-            @remove="removeAlbum"
-            @confirm="updateAlbum"
-
+            @remove="askToRemoveAlbum"
+            @confirm="updateItem"
         />
     </div>
-
     <div  v-if="!isLastPage">
         <div class="spinner-border" role="status" ><span class="visually-hidden">Loading...</span>  </div>
         <button   @click="loadMorePosts">Загрузить еще</button>
     </div>
 <!--    <div   v-intersection="loadMorePosts" class="observer"></div>-->
     <div class="fixed-bottom" style="margin: 0 auto; width: 150px; margin-bottom: 10px">
-        <button type="button" class="btn btn-info" @click="addalbum = true">добавить альбом</button></div>
+        <button type="button" class="btn btn-info" @click="showAddAlbum = true">добавить альбом</button></div>
 </template>
 
 <script>
@@ -43,40 +44,38 @@ import MyDialog from "@/components/UI/MyDialog";
 import DeleteConfirm from "@/components/albums/DeleteConfirm";
 import SelectBar from "@/components/albums/SelectBar";
 import CreateForm from "@/components/albums/CreateForm";
-import useAlbums from "@/composables/albums";
+import useItems from "@/composables/itemsAPI";
 import {onMounted} from "vue";
 export default {
     name: "AlbumList.vue",
     emits: ["remove", "confirm", "cancel"],
     components: {CreateForm, SelectBar, DeleteConfirm, AlbumItem, MyDialog},
     setup(){
-        const { items, getAlbums, destroyAlbum, updateAlbum, createAlbum, isLastPage, setItemType} = useAlbums()
+        const { items, getItems, destroyItem, updateItem, createItem, isLastPage, setItemType, currentPage} = useItems()
 
         let albums=items
          onMounted(()=>{
              setItemType('album')
-             getAlbums()
-
+             getItems()
          })
 
         return {
             albums,
             isLastPage,
-            getAlbums,
-            destroyAlbum,
-            updateAlbum,
-            createAlbum
+            currentPage,
+            getItems,
+            destroyItem,
+            updateItem,
+            createItem
         }
     },
     data(){
         return{
-          //  albums:[],
-            showdialog: false,
-            deletealbum: {},
-            addalbum: false,
-            page: 0,
+            showPopUp: false,
+            deletingAlbum: {},
+            showAddAlbum: false,
             filter: null,
-            showspinner : true
+            showSpinner : true
         }
     },
 
@@ -84,43 +83,32 @@ export default {
         filterAlbums(filter){
             this.filter = filter
             this.albums = []
-            this.page = 0
+            this.currentPage = 0
             this.loadMorePosts()
-            this.showspinner = true
+            this.showSpinner = true
         },
-        addAlbum(album)
-        {
-            this.createAlbum(album)
-            this.addalbum = false
+        addAlbum(album) {
+            this.createItem(album)
+            this.showAddAlbum = false
         },
-        removeAlbum(album){
-            this.showdialog = true;
-            this.deletealbum = album
+        askToRemoveAlbum(album){
+            this.showPopUp = true;
+            this.deletingAlbum = album
         },
         loadMorePosts(){
-            this.page++
-            console.log(this.isLastPage)
-            this.getAlbums(this.filter, this.page)
+            this.getItems(this.filter)
         },
-        async deleteAlbum(album){
-            this.destroyAlbum(album)
-            this.buttons = false;
-            this.deletealbum = null
-            this.showdialog = false;
+        async confirmAlbumDeletion(album){
+            this.destroyItem(album)
+            this.deletingAlbum = null
+            this.showPopUp = false;
         },
     },
 }
 </script>
 
 <style scoped>
-.album-list{
-    width:90%;
-    margin: 0 auto;
-}
-.article {
-    text-align: center;
-    font-size: 20px;
-}
+
 .observer{
     height:30px;
 }

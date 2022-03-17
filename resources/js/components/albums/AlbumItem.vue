@@ -2,7 +2,6 @@
     <div class="album-item d-flex align-items-center justify-content-center">
         <div class="row  align-middle"
              style=" min-height: 75px; width: 98%;  "
-             @click = "buttons = true"
              @mouseover="hover = true"
              @mouseleave="hover = false"
         >
@@ -32,8 +31,8 @@
             <div class="buttons" v-show="edit">
                 <button @click="$emit('confirm', album); edit= false" class="btn btn-success">Сохранить</button>
                 <button class="btn btn-secondary" @click="cancel">Отменить</button>
-                <p v-if="updatestatus" >{{updatestatus}}</p>
             </div>
+            <item-status v-if="album.status" :item="album.status"/>
         </div>
     </div>
 </template>
@@ -41,11 +40,11 @@
 <script>
 import AlbumArtist from "@/components/albums/AlbumArtist";
  import MyInput from "@/components/UI/MyInput";
-//import MyInput from "../UI/MyInput";
+import ItemStatus from "@/components/UI/ItemStatus";
 export default {
     name: "AlbumItem",
     emits: ['remove', 'confirm', 'cancel'],
-    components: {MyInput, AlbumArtist},
+    components: {ItemStatus, MyInput, AlbumArtist},
     props:{
         album:{
             type: Object,
@@ -65,15 +64,12 @@ export default {
     data(){
         return{
             hover: false,
-            updatestatus:"",
-            buttons:false,
             edit: false,
             defaultItem:{
                 artists:{},
                 name: '',
                 year: 0
             }
-
         }
     },
     mounted() {
@@ -81,14 +77,8 @@ export default {
             this.edit = true
     },
     methods:{
-
-        showButtons(){
-            this.buttons = true;
-        },
         async removeAlbum(){
-            this.updatestatus = "данные успешно обновлены";
             this.$emit('remove',this.album);
-            this.buttons = false;
         },
         deleteArtist(artist){
             this.album.artists=this.album.artists.filter(p => p.id !== artist.id);
@@ -123,19 +113,11 @@ export default {
     background-color:rgba(172,177,150,0.58);
     width: 100%;
     min-height: 50px;
-    /*#a0aec0*/
-    /*display: inline-block;*/
     border: 1px solid;
     border-radius: 15px;
     margin-bottom: 5px;
 }
 
-
-
-.buttons{
-    margin-top: 5px;
-    margin-bottom: 5px;
-}
 .year{
     float:right;
 

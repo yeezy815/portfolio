@@ -13,6 +13,9 @@ class Album extends Model
         "name",
         "year"
     ];
+
+    protected $hidden= ["pivot"];
+
     public function artists()
     {
         return $this->belongsToMany(Artist::class);

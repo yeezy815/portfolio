@@ -24,3 +24,5 @@ Route::get('/artists/{id}',[ArtistController::class,'show']);
 Route::resource('albums', AlbumController::class);
 
 Route::apiResource('dairy',\App\Http\Controllers\DairyController::class);
+
+Route::get('/albums/{id}/dairy', [AlbumController::class, 'showDairies']);

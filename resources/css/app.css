@@ -2,3 +2,16 @@
     color: black;
     text-decoration:none
 }
+
+.item-list{
+    width:90%;
+    margin: 0 auto;
+}
+
+.article {
+    text-align: center;
+    font-size: 20px;
+}
+
+.item-link:hover{
+    color: #f7f7f7}

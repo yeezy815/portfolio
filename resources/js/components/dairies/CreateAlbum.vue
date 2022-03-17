@@ -12,7 +12,7 @@
 <script>
 import MyDialog from "@/components/UI/MyDialog";
 import AlbumItem from "@/components/albums/AlbumItem";
-import useAlbums from "@/composables/albums";
+import useItems from "@/composables/itemsAPI";
 import {onMounted} from "vue";
 
 
@@ -20,12 +20,12 @@ export default {
     name: "CreateAlbum",
     emits: ['confirm', 'cancel'],
     setup(props, {emit}){
-        const {  createAlbum,items, setItemType} = useAlbums()
+        const {  createItem,items, setItemType} = useItems()
 
         let albums=items
 
         const getCreatedItem = async (album) => {
-             await createAlbum(album)
+             await createItem(album)
              emit('confirm',albums.value[0])
              emit('close')
         }
@@ -38,7 +38,7 @@ export default {
 
 
         return {
-            createAlbum,
+            createItem,
             getCreatedItem,
             albums
         }

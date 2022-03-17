@@ -36,12 +36,20 @@ class AlbumController extends Controller
             $album = $album->where('year', '>=', $request["min_year"]);
         if (isset($request["max_year"]))
             $album = $album->where('year', '<=', $request["max_year"]);
-
-
         $order = $request->sortBy ?? 'year';
         $sortorder = $request->sortorder ?? 'asc';
         return $album->with('artists')->OrderBy($order, $sortorder)->paginate(25);
     }
+
+
+
+    public function showDairies($id)
+    {
+        return Album::with('artists')->with('dairies')->findOrFail($id);
+    }
+
+
+
 
 
     /**
@@ -49,7 +57,6 @@ class AlbumController extends Controller
      * @param Request $request
      * @return mixed
      */
-
 
 
 

@@ -12,9 +12,9 @@ class Artist extends Model
     protected $fillable = [
         "name"
     ];
-    protected $hidden= ["pivot"];
+    protected $hidden = ["pivot"];
     public function albums()
     {
-        return $this->belongsToMany(Album::class);
+        return $this->belongsToMany(Album::class)   ;
     }
 }

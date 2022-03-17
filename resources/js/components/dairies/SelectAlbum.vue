@@ -27,7 +27,7 @@
 <script>
 import MyDialog from "@/components/UI/MyDialog";
 import SelectBar from "@/components/albums/SelectBar";
-import useAlbums from "@/composables/albums";
+import useItems from "@/composables/itemsAPI";
 import {onMounted} from "vue";
 
 export default {
@@ -35,19 +35,23 @@ export default {
     emits: ['changePage', 'setAlbum', 'filter'],
     components: {SelectBar, MyDialog},
     setup(){
-        const { albums, lastPage, currentPage, getAlbums, destroyAlbum, updateAlbum, createAlbum} = useAlbums()
+        const { items, lastPage, currentPage, getItems, destroyItem, updateItem, createItem, setItemType} = useItems()
 
+        let albums = items
 
-        onMounted(getAlbums)
+        onMounted(() => {
+            setItemType("album")
+            getItems()
+        })
 
         return {
             albums,
             lastPage,
             currentPage,
-            getAlbums,
-            destroyAlbum,
-            updateAlbum,
-            createAlbum
+            getItems,
+            destroyItem,
+            updateItem,
+            createItem
         }
     },
     data(){
@@ -63,7 +67,7 @@ export default {
     methods:{
         filterAlbums(filter, page=1){
             this.filter = filter
-            this.getAlbums(filter, page)
+            this.getItems(filter, page)
             //this.$emit('filter', filter);
         }
     },

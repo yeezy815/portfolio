@@ -2,47 +2,43 @@
     <div class="article">
         <p> Записи </p>
     </div>
-    {{test}}
-    <div class="album-list" >
+    <div class="item-list" >
         <dairy-item v-for="dairy in dairies" :dairy="dairy"
-                    @remove="removeAlbum"
-                    @confirm="putDairy(dairy)"
+                    @remove="askRemoveDairy"
+                    @confirm="updateDairy(dairy)"
                     @editalbum="editAlbum"
-                    @cancel="cancelEdit"
         />
     </div>
-    <div class="spinner-border" role="status" v-if="showspinner"><span class="visually-hidden">Loading...</span>  </div>
-<!--    <div   v-intersection="getDairies" class="observer"></div>-->
-    <button   @click="getDairies(filter)">Загрузить еще</button>
+    <div class="spinner-border" role="status" v-if="showSpinner"><span class="visually-hidden">Loading...</span>  </div>
+<!--    <div   v-intersection="getItems" class="observer"></div>-->
+    <button @click="loadMoreItems">Загрузить еще</button>
     <div class="fixed-bottom" style="margin: 0 auto; width: 150px; margin-bottom: 10px">
-        <button type="button" class="btn btn-info" @click="adddairy= true">добавить запись</button>
+        <button type="button" class="btn btn-info" @click="showAddDairy= true">добавить запись</button>
     </div>
-    <my-dialog v-if="showdialog">
-        <delete-confirm :message="'удалить запись от '+ deletealbum.date"
-                        @cancel="showdialog = false"
-                        @confirm="deleteAlbum(deletealbum)"/>
+    <my-dialog v-if="showPopUp">
+        <delete-confirm :message="'удалить запись от '+ deletingDairy.date"
+                        @cancel="showPopUp = false"
+                        @confirm="confirmDairyDeletion(deletingDairy)"
+        />
     </my-dialog>
 
-
-    <my-dialog v-show="adddairy" @close="adddairy = false">
+    <my-dialog v-show="showAddDairy" @close="showAddDairy = false">
         <dairy-item
-            :dairy="addeddairy"
+            :dairy="addingDairy"
             :creation="true"
-            @cancel="adddairy = false"
-            @remove="removeAlbum"
-            @confirm="newDairy"
+            @cancel="showAddDairy = false"
+            @remove="askRemoveDairy"
+            @confirm="onCreateDairy"
             @editalbum="editAlbum"
         />
     </my-dialog>
 
-
     <attach-album
-        v-show="editalbum"
-        @close="editalbum=false"
+        v-show="showEditDairy"
+        @close="showEditDairy=false"
         @setAlbum="setAlbum"
     />
 </template>
-
 <script>
 import AlbumItem from "@/components/albums/AlbumItem";
 import MyDialog from "@/components/UI/MyDialog";
@@ -52,115 +48,79 @@ import CreateForm from "@/components/albums/CreateForm";
 import DairyItem from "@/components/dairies/DairyItem";
 import AlbumList from "@/pages/AlbumList";
 import AttachAlbum from "@/components/dairies/AttachAlbum";
-import useDairies from "@/composables/dairies";
+import useItems from "@/composables/itemsAPI";
 import {onMounted} from "vue";
-
 export default {
-    name: "AlbumList.vue",
-
-    emits: ["remove", "confirm", "cancel", "close",  "createAlbum", "setAlbum", "filter"],
+    name: "DairyList",
+    emits: ["remove", "confirm", "cancel", "close",  "createItem", "setAlbum", "filter"],
     components: {
     AttachAlbum, DairyItem, CreateForm, SelectBar, DeleteConfirm, AlbumItem, MyDialog, AlbumList},
-
     setup(){
-      const { dairies, getDairies, destroyDairy, updateDairy, createDairy} = useDairies()
+      const { items, getItems, setItemType, destroyItem, updateItem, createItem} = useItems()
 
-
-         onMounted(getDairies)
-
-        const deleteDairy = async (dairy) => {
-          await destroyDairy(dairy)
-        }
-
-        const putDairy = async (dairy) => {
-            await updateDairy(dairy)
-        }
-
-        const addDairy = async (dairy) => {
-            await createDairy(dairy)
-        }
-
-        let test = dairies
+         onMounted(() => {
+             setItemType('dairy')
+             getItems()
+         })
 
         return {
-          dairies,
-            test,
-        getDairies,
-         deleteDairy,
-            putDairy,
-            addDairy
+          dairies : items,
+            getItems,
+            deleteDairy :  destroyItem,
+            updateDairy: updateItem,
+            createDairy : createItem
         }
     },
 
     data(){
         return{
-            addeddairy: {},
-            showdialog: false,
-            deletealbum: {},
-            adddairy: false,
+            addingDairy: {},
+            showPopUp: false,
+            deletingDairy: {},
+            showAddDairy: false,
             filter: null,
-            showspinner : true,
-            editalbum: false,
-            dairyitem:{},
+            showSpinner : true,
+            showEditDairy: false,
+            editingDairyId:{},
         }
     },
     methods:{
-        editAlbum(dairy)
-            {
-                this.editalbum = true
-                this.dairyitem = dairy
+        editAlbum(dairy) {
+                this.showEditDairy = true
+                this.editingDairyId = dairy.id
             },
-        async newDairy(dairy)
-        {
-            this.adddairy = false
-            this.addDairy(dairy)
+        loadMoreItems(){
+            this.showSpinner = true
+            this.getItems(this.filter)
+            this.showSpinner = false
+        },
+        async onCreateDairy(dairy) {
+            this.showAddDairy = false
+            this.createDairy(dairy)
         },
         async setAlbum(album){
-            const objIndex = this.dairies.findIndex((o => o.id === this.dairyitem.id));
-            if (!this.adddairy) {
+            const objIndex = this.dairies.findIndex((o => o.id === this.editingDairyId));
+            if (!this.showAddDairy) {
                 this.dairies[objIndex].albums = album
                 this.dairies[objIndex].album_id = album.id
             }
             else {
-                this.addeddairy.albums = album
-                this.addeddairy.album_id = album.id
+                this.addingDairy.albums = album
+                this.addingDairy.album_id = album.id
             }
-            this.editalbum = false
-
+            this.showEditDairy = false
         },
-        removeAlbum(album){
-            this.showdialog = true;
-            this.deletealbum = album
+        askRemoveDairy(album){
+            this.showPopUp = true;
+            this.deletingDairy = album
         },
-        loadMorePosts(){
-         //   this.fetchDairies()
-        },
-        cancelEdit(actualDairyVal){
-            const objIndex = this.dairies.findIndex((o => o.id === actualDairyVal.id))
-            this.dairies[objIndex]=actualDairyVal
-        },
-
-        async deleteAlbum(album){
+         confirmDairyDeletion(album){
             this.deleteDairy(album)
-            this.deletealbum = null
-            this.buttons = false
-            this.showdialog = false;
+            this.deletingDairy = null
+            this.showPopUp = false;
         },
     },
 }
 </script>
-
 <style scoped>
-.album-list{
-    width:90%;
-    margin: 0 auto;
-}
-.article {
-    text-align: center;
-    font-size: 20px;
-}
-.observer{
-    height:30px;
-}
-
 </style>

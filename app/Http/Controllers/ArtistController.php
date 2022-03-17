@@ -9,10 +9,6 @@ class ArtistController extends Controller
 {
     public function show($id)
     {
-        $artist = Artist::find($id);
-       // var_dump($artist);
-        foreach ($artist->albums as $album)
-            print_r($album->name."<br>");
-        return "1222";
+        return  Artist::with('albums')->find($id);
     }
 }

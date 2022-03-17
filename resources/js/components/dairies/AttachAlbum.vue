@@ -49,7 +49,7 @@ import SelectAlbum from "@/components/dairies/SelectAlbum";
 export default {
     name: "AttachAlbum",
     components: {AlbumItem, CreateAlbum, MyDialog, DairyItem, SelectAlbum},
-    emits: ['close', 'confirm', 'cancel', 'fetchAlbums', 'createAlbum', 'setAlbum', 'filter', 'changePage'],
+    emits: ['close', 'confirm', 'cancel', 'fetchAlbums', 'createItem', 'setAlbum', 'filter', 'changePage'],
 
 
 
@@ -66,8 +66,8 @@ export default {
 
 
     methods:{
-        createAlbum(album){
-           this.$emit('createAlbum',album);
+        createItem(album){
+           this.$emit('createItem',album);
            this.showCreateAlbum = false;
            this.$emit('close')
         },

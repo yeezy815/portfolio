@@ -26,7 +26,7 @@ class AlbumRequest extends FormRequest
     {
         return [
             'name' => 'required',
-            'year' => 'required',
+            'year' => 'required||integer|min:0',
             'artists' => 'array',
         ];
     }

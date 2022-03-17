@@ -40,6 +40,9 @@ class DairyController extends Controller
         return Dairy::with('albums')->findOrFail($id);
     }
 
+
+
+
     /**
      * Update the specified resource in storage.
      *
@@ -63,4 +66,8 @@ class DairyController extends Controller
     {
         return Dairy::destroy($id);
     }
+
+
+
+
 }

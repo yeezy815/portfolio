@@ -8,7 +8,6 @@
         <link href="{{mix('css/app.css')}}" rel="stylesheet">
     </head>
     <body>
-    <a href="ya.ru" class="item-link">rrrrr </a>
         <div id="app">
 
         </div>

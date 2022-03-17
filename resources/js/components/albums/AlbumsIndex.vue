@@ -22,7 +22,7 @@
             v-for="album in albums"
             :album="album"
             @remove="removeAlbum"
-            @confirm="updateAlbum"
+            @confirm="updateItem"
 
         />
 
@@ -133,7 +133,7 @@ export default {
             console.log("222")
             this.fetchAlbums()
         },
-        async updateAlbum(album){
+        async updateItem(album){
             const newar = [];
             album.artists.forEach(element => newar.push(element.name));
             console.log(newar);
