@@ -8,7 +8,7 @@
                 <div class="row">
                     <div class="col-4" >
                        <p>Дата:
-                           <my-input v-model="dairy.date" v-if="edit" placeholder="дд.мм.гггг" />
+                           <my-input v-model="dairy.date" v-if="edit" placeholder="гггг-мм-дд" @input="input"/>
                            <span v-else>{{dairy.date}}</span>    </p>
                     </div>
 
@@ -20,9 +20,9 @@
 
                 <div class="row" >
                     <div class="col album-info" @click="editAlbum" >
-                        <div class="col" v-if="dairy.albums">
+                        <div class="col">
                             <p>Альбом:
-                              <a :href="(!edit) ?'/albums/' + dairy.albums.id :null" class="item-link">
+                              <a :href="(!edit) ? $link['albums'] + dairy.albums.id :null" class="item-link" v-if="dairy.albums">
                                 <span >{{dairy.albums.name}}</span>
                               </a>
                             </p>
@@ -31,7 +31,7 @@
                         <div class="col" v-if="dairy.albums && dairy.albums.artists && dairy.albums.artists.length >0">
                             <span>Исполнитель:</span><br>
                             <span v-for="artist in dairy.albums.artists">
-                                <a :href="(!edit) ? '/api/artists/' + artist.id : null" class="item-link">    {{artist.name}} </a>
+                                <a :href="(!edit) ? $link['artists'] + artist.id : null" class="item-link">    {{artist.name}} </a>
                                 <span v-if="artist.id !== dairy.albums.artists[dairy.albums.artists.length-1].id">, </span>
                             </span>
                         </div>
@@ -137,6 +137,9 @@ export default {
         }
     },
     methods:{
+        input: function(key) {
+            this.dairy.date =  this.dairy.date.replace(/[^0-9-]+/g, "")
+        },
         save(){
             this.$emit('confirm', this.dairy)
             if (!this.creation) {

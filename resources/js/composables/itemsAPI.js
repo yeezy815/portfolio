@@ -59,6 +59,7 @@ export default function useItems(){
 
     const getItems = async (filter) => {
         if (filter) {
+            items.value = []
             Object.keys(filter).forEach(key => {
                 if (filter[key] === null || filter[key] === '') {
                     delete filter[key];
@@ -103,15 +104,21 @@ export default function useItems(){
     }
 
     const createItem = async (albumItem) => {
+        let item = JSON.stringify(albumItem)
        await  axios.post(  itemLink.value , albumItem, headers).then(
-           response => {
+           (response, albumItem = albumItem) => {
+              // console.log(JSON.parse(item))
                 if (itemType.value === "album")
-                     items.value.push(response.data)
+                     items.value.unshift(response.data)
+
                 else
-                    items.value.push(albumItem)
-                // fail(response, albumItem)
+                    items.value.unshift(JSON.parse(item))
             }
        )
+       //     .catch(
+       //         alert("не удалось создать объект")
+       //
+       // )
     }
 
     function success(response){

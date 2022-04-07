@@ -20,25 +20,37 @@ class AlbumController extends Controller
         $request->validate([
             'min_year' => 'integer',
             'max_year' => 'integer',
-           'sortBy'   => 'in:year,name,artists',
-            'sortorder' => 'in:asc,desc'
+            'sortBy'   => 'in:year,name,artists',
+            'sortorder' => 'in:asc,desc',
+            'artist' => 'string'
         ]);
-//        $artists = [];
-//        $request->artists = str_replace('-', ' ', $request->artists);
-//        $request->artists = str_replace(';', '', $request->artists);
-//        $request->artists = str_replace(',', '', $request->artists);
-//        $artists = explode(' ', $request->artists);
-//        return $artists;
+
         $album = new Album();
-        if (isset($request["album"]))
-            $album = $album->where('name', 'like', '%'.$request["album"].'%');
-        if (isset($request["min_year"]))
-            $album = $album->where('year', '>=', $request["min_year"]);
-        if (isset($request["max_year"]))
-            $album = $album->where('year', '<=', $request["max_year"]);
+
+        if ($request->has('artist')) {
+            $artists = [];
+            $request->artist = str_replace('-', ' ', $request->artist);
+            $request->artist = str_replace(';', '', $request->artist);
+            $request->artist = str_replace(',', '', $request->artist);
+            $artists = explode(' ', $request->artist);
+            $album = Album::whereHas('artists', function ($query) use ($artists) {
+                $query->where(function($query) use ($artists){
+                    foreach ($artists as $artist) {
+                        $query->orWhere('artists.name', 'like', '%' . $artist . '%');
+                    }
+                });
+
+            });
+        }
+        if ($request->has('album'))
+                $album = $album->where('name', 'like', '%'.$request->input('album').'%');
+        if ($request->has('min_year'))
+            $album = $album->where('year', '>=', $request->min_year);
+        if ($request->has('max_year'))
+            $album = $album->where('year', '<=', $request->max_year);
         $order = $request->sortBy ?? 'year';
-        $sortorder = $request->sortorder ?? 'asc';
-        return $album->with('artists')->OrderBy($order, $sortorder)->paginate(25);
+        $sortOrder = $request->sortorder ?? 'asc';
+        return $album->with('artists')->OrderBy($order, $sortOrder)->paginate(25);
     }
 
 
@@ -50,26 +62,20 @@ class AlbumController extends Controller
 
 
 
-
-
     /**
      * Creates an album.
      * @param Request $request
      * @return mixed
      */
 
-
-
-
-
     public function store(AlbumRequest $request)
     {
        // $artists = AlbumController::findOrCreateArtists($request["artists"]);
         $album =Album::create([
-            "name" => $request["name"],
-            "year" => $request["year"]
+            'name' => $request->name,
+            'year' =>$request->year
         ]);
-        $album->artists()->sync($request["artists"]);
+        $album->artists()->sync($request->artists);
         return Album::with('artists')->find($album["id"]);
     }
 
@@ -93,10 +99,10 @@ class AlbumController extends Controller
     public function update(AlbumRequest $request, $id)
     {
         $album = Album::findOrFail($id);
-        $album->artists()->sync($request["artists"]);
+        $album->artists()->sync($request->artists);
         return $album->update([
-            "name" => $request["name"],
-            "year" => $request["year"]
+            'name' => $request->name,
+            'year' =>$request->year
         ]);
     }
 }

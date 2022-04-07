@@ -7,7 +7,7 @@ import ArtistInfo from "@/pages/ArtistInfo";
 import AlbumInfo from "@/pages/AlbumInfo";
 const routes = [
     {
-        path: '/',
+        path: '/albums',
         component: AlbumList
     },
     {

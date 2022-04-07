@@ -1,4 +1,5 @@
 <template>
+   <vue-header/>
     <div class="article">
         <p> Записи </p>
     </div>
@@ -9,9 +10,10 @@
                     @editalbum="editAlbum"
         />
     </div>
-    <div class="spinner-border" role="status" v-if="showSpinner"><span class="visually-hidden">Loading...</span>  </div>
-<!--    <div   v-intersection="getItems" class="observer"></div>-->
-    <button @click="loadMoreItems">Загрузить еще</button>
+    <show-more-items v-show="!isLastPage"
+    @loadMore="getItems"
+
+    />
     <div class="fixed-bottom" style="margin: 0 auto; width: 150px; margin-bottom: 10px">
         <button type="button" class="btn btn-info" @click="showAddDairy= true">добавить запись</button>
     </div>
@@ -22,7 +24,7 @@
         />
     </my-dialog>
 
-    <my-dialog v-show="showAddDairy" @close="showAddDairy = false">
+    <my-dialog v-if="showAddDairy" @close="showAddDairy = false">
         <dairy-item
             :dairy="addingDairy"
             :creation="true"
@@ -50,13 +52,17 @@ import AlbumList from "@/pages/AlbumList";
 import AttachAlbum from "@/components/dairies/AttachAlbum";
 import useItems from "@/composables/itemsAPI";
 import {onMounted} from "vue";
+import ShowMoreItems from "@/components/UI/ShowMoreItems";
+import VueHeader from "@/components/UI/VueHeader";
 export default {
     name: "DairyList",
     emits: ["remove", "confirm", "cancel", "close",  "createItem", "setAlbum", "filter"],
     components: {
+        VueHeader,
+        ShowMoreItems,
     AttachAlbum, DairyItem, CreateForm, SelectBar, DeleteConfirm, AlbumItem, MyDialog, AlbumList},
     setup(){
-      const { items, getItems, setItemType, destroyItem, updateItem, createItem} = useItems()
+      const { items, getItems, setItemType, destroyItem, updateItem, createItem, isLastPage} = useItems()
 
          onMounted(() => {
              setItemType('dairy')
@@ -65,6 +71,7 @@ export default {
 
         return {
           dairies : items,
+            isLastPage,
             getItems,
             deleteDairy :  destroyItem,
             updateDairy: updateItem,
@@ -78,8 +85,6 @@ export default {
             showPopUp: false,
             deletingDairy: {},
             showAddDairy: false,
-            filter: null,
-            showSpinner : true,
             showEditDairy: false,
             editingDairyId:{},
         }
@@ -89,11 +94,6 @@ export default {
                 this.showEditDairy = true
                 this.editingDairyId = dairy.id
             },
-        loadMoreItems(){
-            this.showSpinner = true
-            this.getItems(this.filter)
-            this.showSpinner = false
-        },
         async onCreateDairy(dairy) {
             this.showAddDairy = false
             this.createDairy(dairy)
@@ -108,7 +108,8 @@ export default {
                 this.addingDairy.albums = album
                 this.addingDairy.album_id = album.id
             }
-            this.showEditDairy = false
+               this.showEditDairy = false
+
         },
         askRemoveDairy(album){
             this.showPopUp = true;
@@ -120,6 +121,9 @@ export default {
             this.showPopUp = false;
         },
     },
+    created() {
+        document.title = "Записи"
+    }
 }
 </script>
 <style scoped>

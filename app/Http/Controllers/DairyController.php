@@ -22,11 +22,13 @@ class DairyController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     *
      */
     public function store(DairyRequest $request)
     {
-       Dairy::create($request->validated());
+      $dairy =  Dairy::create($request->validated());
+       print_r($dairy->toArray());
+        return Dairy::with('albums')->find($request["id"]);
     }
 
     /**

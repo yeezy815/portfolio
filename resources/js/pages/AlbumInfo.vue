@@ -1,9 +1,11 @@
 <template>
     <div>
+        <vue-header/>
         <div class = "header" style="margin-left: 200px" >
             <span v-for="artist in album.artists" >
-                  {{artist.name}}<span v-if="artist !== album.artists[album.artists.length -1]">, </span>
-            </span> <span v-if="album.artists && album.artists.length > 0">-</span> {{album.name}}
+               <a :href="$link['artists'] + artist.id" class="custom-link"> {{artist.name}}</a>  <span v-if="artist !== album.artists[album.artists.length -1]">, </span>
+            </span> <span v-if="album.artists && album.artists.length > 0">-</span>
+            <a class="custom-link" :href="$link['albums'] + album.id" >{{album.name}}</a>
         </div> <hr>
         <div style="margin-left: 200px" >
             <p class="mention align-items-center">История прослушиваний</p>
@@ -37,8 +39,10 @@
 import useItems from "@/composables/itemsAPI";
 import {onMounted} from "vue";
 import {useRoute} from "vue-router";
+import VueHeader from "@/components/UI/VueHeader";
 export default {
     name: "AlbumInfo",
+    components: {VueHeader},
     setup(){
         const { item, getItemWithRelation, setItemType} = useItems()
         const route =useRoute()
@@ -56,7 +60,9 @@ export default {
             // getItem
         }
     },
-
+    created() {
+        document.title = "Информация об альбоме"
+    }
 
 }
 </script>

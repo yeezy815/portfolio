@@ -11,8 +11,15 @@
             </div>
             <div class="row">
                 <div class="col w-25">
-                    <button  class="btn btn-info w-100 mb-5" @click="showCreateAlbum = true" >
+                    <button  class="btn btn-info w-100 mb-1" @click="showCreateAlbum = true" >
                         создать новый альбом
+                    </button>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col w-25" >
+                    <button  class="btn btn-info w-100 mb-5" @click="deleteAlbum">
+                        удалить текущий альбом
                     </button>
                 </div>
             </div>
@@ -66,10 +73,8 @@ export default {
 
 
     methods:{
-        createItem(album){
-           this.$emit('createItem',album);
-           this.showCreateAlbum = false;
-           this.$emit('close')
+        deleteAlbum(){
+            this.setAlbum({id: null})
         },
         setAlbum(album){
             this.$emit('setAlbum', album)

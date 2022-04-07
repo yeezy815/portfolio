@@ -3,9 +3,9 @@
         <select-bar
             @filter="filterAlbums"/>
         <div style="width:80%">
-            <div style="margin-bottom: 5px"
+            <div style="margin-bottom: 5px; cursor:pointer"
                  v-for="album in albums"
-                 @click="$emit('setAlbum',album)">
+                 @click="setAlbum(album)">
                 Исполнитель:
                 <span v-for="artist in album.artists">
                      <span v-if="artist.id !==album.artists[0].id">, </span>
@@ -16,7 +16,7 @@
                 <div v-for="page in lastPage"
                      @click="filterAlbums(filter, page)"
                      :class="{'choosed' : page === currentPage}"
-                     class="page-btn">
+                     class="page-btn" >
                     {{page}}
                 </div>
             </div>
@@ -45,7 +45,7 @@ export default {
         })
 
         return {
-            albums,
+           albums,
             lastPage,
             currentPage,
             getItems,
@@ -65,10 +65,16 @@ export default {
         }
     },
     methods:{
-        filterAlbums(filter, page=1){
+        filterAlbums(filter, page){
             this.filter = filter
-            this.getItems(filter, page)
-            //this.$emit('filter', filter);
+            if (page)
+                this.currentPage = page -1
+            else this.currentPage = 0
+            this.getItems(filter)
+        },
+        setAlbum(album){
+            this.$emit('setAlbum',album)
+            this.$emit('close')
         }
     },
 }
@@ -87,6 +93,7 @@ export default {
     width: 30px;
     height: 30px;
     border: 2px solid #000000;
+    cursor: pointer;
 }
 .choosed{
     background-color: green;

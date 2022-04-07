@@ -21,6 +21,10 @@ class Album extends Model
         return $this->belongsToMany(Artist::class);
     }
 
+    public function artistsWithFilter(){
+        return $this->belongsToMany(Artist::class)->wherePivot('artist_id','=',10);
+    }
+
     public function dairies()
     {
         return $this->hasMany(Dairy::class);

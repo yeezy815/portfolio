@@ -9,16 +9,16 @@
                 <album-artist :artists="album.artists" :edit="edit" @remove="deleteArtist"/>
             </div>
             <div class="col" >
-                <a :href="'/albums/' + album.id"
+                <a :href="$link['albums'] + album.id"
                    v-if="!edit"
                    class="item-link"
                 >
-                    <p >{{album.name}}</p></a>
+                    <p>{{album.name}}</p></a>
                 <my-input v-else v-model="album.name" placeholder="альбом"/>
             </div>
             <div class="col-1" >
                 <p  class="year"  >Год:
-                    <my-input v-if="edit" v-model="album.year" placeholder="год" />
+                    <my-input v-if="edit" v-model="album.year" placeholder="год" @change="input"/>
                     <span v-else>{{album.year}}</span>
                 </p>
             </div>
@@ -77,6 +77,9 @@ export default {
             this.edit = true
     },
     methods:{
+        input: function(key) {
+            this.album.year=  this.album.year.replace(/[^0-9]+/g, "")
+        },
         async removeAlbum(){
             this.$emit('remove',this.album);
         },

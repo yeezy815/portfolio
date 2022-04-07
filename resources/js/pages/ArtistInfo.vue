@@ -1,14 +1,13 @@
 <template>
     <div>
-       <div class = "header" style="margin-left: 200px">  {{artist.name}}</div> <hr>
+     <vue-header/>
+       <div class = "header" style="margin-left: 200px"> <a :href="$link['artists'] + artist.id" class="custom-link">{{artist.name}}</a> </div> <hr>
             <div style="margin-left: 200px">
                 <p class="mention align-items-center">Альбомы исполнителя</p>
                 <div v-for="album in artist.albums" style="margin-bottom:10px">
-               Альбом     {{album.name}} - {{album.year}}г.
+              <a :href="$link['albums'] + album.id" class="custom-link">  Альбом   {{album.name}}   - {{album.year}}г. </a>
                 </div>
             </div>
-        <div class="fixed-bottom" style="margin: 0 auto; width: 150px; margin-bottom: 10px">
-            <button type="button" class="btn btn-dark">добавить альбом</button></div>
     </div>
 </template>
 
@@ -16,8 +15,13 @@
 import useItems from "@/composables/itemsAPI";
 import {onMounted} from "vue";
 import {useRoute} from "vue-router";
+import VueHeader from "@/components/UI/VueHeader";
 export default {
     name: "ArtistInfo",
+    components: {VueHeader},
+    created() {
+        document.title = "Информация об исполнителе"
+    },
     setup(){
         const { item, getItem, setItemType} = useItems()
         const route =useRoute()
@@ -35,6 +39,7 @@ export default {
             getItem
         }
     },
+
 }
 </script>
 

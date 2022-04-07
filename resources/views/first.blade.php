@@ -3,11 +3,13 @@
 
     <head>
         <title>
-            hi
+
         </title>
         <link href="{{mix('css/app.css')}}" rel="stylesheet">
     </head>
     <body>
+{{--        </div>Альбомы записи</div>--}}
+
         <div id="app">
 
         </div>

@@ -1,4 +1,5 @@
 <template>
+    <vue-header/>
     <div class="article">
         <p> Все прослушанные альбомы </p>
     </div>
@@ -29,10 +30,9 @@
             @confirm="updateItem"
         />
     </div>
-    <div  v-if="!isLastPage">
-        <div class="spinner-border" role="status" ><span class="visually-hidden">Loading...</span>  </div>
-        <button   @click="loadMorePosts">Загрузить еще</button>
-    </div>
+    <show-more-items v-show="!isLastPage"
+    @loadMore="loadMorePosts"
+    />
 <!--    <div   v-intersection="loadMorePosts" class="observer"></div>-->
     <div class="fixed-bottom" style="margin: 0 auto; width: 150px; margin-bottom: 10px">
         <button type="button" class="btn btn-info" @click="showAddAlbum = true">добавить альбом</button></div>
@@ -46,10 +46,12 @@ import SelectBar from "@/components/albums/SelectBar";
 import CreateForm from "@/components/albums/CreateForm";
 import useItems from "@/composables/itemsAPI";
 import {onMounted} from "vue";
+import ShowMoreItems from "@/components/UI/ShowMoreItems";
+import VueHeader from "@/components/UI/VueHeader";
 export default {
     name: "AlbumList.vue",
     emits: ["remove", "confirm", "cancel"],
-    components: {CreateForm, SelectBar, DeleteConfirm, AlbumItem, MyDialog},
+    components: {VueHeader, ShowMoreItems, CreateForm, SelectBar, DeleteConfirm, AlbumItem, MyDialog},
     setup(){
         const { items, getItems, destroyItem, updateItem, createItem, isLastPage, setItemType, currentPage} = useItems()
 
@@ -104,6 +106,9 @@ export default {
             this.showPopUp = false;
         },
     },
+    created() {
+        document.title = "Альбомы"
+    }
 }
 </script>
 

@@ -1,5 +1,5 @@
 <template>
-    <a v-if="!edit" :href="'/artists/' + artist.id" class="item-link">
+    <a v-if="!edit" :href="$link['artists']+ artist.id" class="item-link">
         <span>{{artist.name}}</span>
     </a>
     <div v-else @mouseover="showdelete = true" @mouseleave="showdelete = false" style="height: 35px">

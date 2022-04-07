@@ -11301,6 +11301,20 @@ textarea.form-control-lg {
     font-size: 20px;
 }
 
+.custom-link{
+
+    text-decoration: none;
+    color: #000000;
+
+
+}
+
+.custom-link:hover{
+    color:#718096;
+    text-decoration: underline;
+}
+
+
 .item-link:hover{
     color: #f7f7f7}
 

@@ -1,29 +1,65 @@
 <template>
-    <div class="select-bar">
+    <div class="select-bar container">
+        <div class="row ">
+            <div class="col ">
         <p>сортировать по
             <select v-model="filter.sortBy">
                 <option value="year">году </option>
                 <option value="artists">исполнителю</option>
                 <option value="name">  альбому</option>
             </select>
-        <select v-model="filter.sortorder">
-            <option value="asc">
-               <span v-if="filter.sortBy==='year'"> возрастанию</span>
-                <span v-else>А-я</span>
-             </option>
-            <option value="desc" selected>
-                <span v-if="filter.sortBy==='year'"> убыванию</span>
-                <span v-else>я-А</span>
-               </option>
-        </select>
-        </p>
+            <select v-model="filter.sortorder">
+                <option value="asc">
 
-       альбом <input v-model="filter.album" >
-       артист <input v-model="filter.artist">
-        год: от <input v-model="filter.min_year" @input="input('min_year')">
-            до <input v-model="filter.max_year" @input="input('max_year')">
-        <button type="button" class="btn btn-info" @click="$emit('filter',filter)">Применить</button>
+                    <span v-if="filter.sortBy==='year'"> возрастанию</span>
+                    <span v-else>А-я</span>
+                </option>
+                <option value="desc" selected>
+                    <span v-if="filter.sortBy==='year'"> убыванию</span>
+                    <span v-else>я-А</span>
+                </option>
+            </select>
+        </p>
+            </div>
+        </div>
+
+        <div class="row">
+
+            <div class="col"> <label>альбом: </label><input v-model="filter.album" ></div>
+            <div class="col"> <label>артист: </label>  <input v-model="filter.artist"></div>
+            год:
+                    <div class="col "><label>от</label>  <input v-model="filter.min_year"  @input="input('min_year')" ></div>
+                    <div class="col "><label>до </label> <input v-model="filter.max_year" @input="input('max_year')"></div>
+        </div>
+            <div > <button type="button" class="btn btn-info" @click="$emit('filter',filter)">Применить</button></div>
+
+
     </div>
+<!--    <div class="select-bar ">-->
+<!--        <p>сортировать по-->
+<!--            <select v-model="filter.sortBy">-->
+<!--                <option value="year">году </option>-->
+<!--                <option value="artists">исполнителю</option>-->
+<!--                <option value="name">  альбому</option>-->
+<!--            </select>-->
+<!--        <select v-model="filter.sortorder">-->
+<!--            <option value="asc">-->
+<!--               <span v-if="filter.sortBy==='year'"> возрастанию</span>-->
+<!--                <span v-else>А-я</span>-->
+<!--             </option>-->
+<!--            <option value="desc" selected>-->
+<!--                <span v-if="filter.sortBy==='year'"> убыванию</span>-->
+<!--                <span v-else>я-А</span>-->
+<!--               </option>-->
+<!--        </select>-->
+<!--        </p>-->
+
+<!--       альбом <input v-model="filter.album" >-->
+<!--       артист <input v-model="filter.artist">-->
+<!--        год: от <input v-model="filter.min_year" @input="input('min_year')">-->
+<!--            до <input v-model="filter.max_year" @input="input('max_year')">-->
+<!--        <button type="button" class="btn btn-info" @click="$emit('filter',filter)">Применить</button>-->
+<!--    </div>-->
 </template>
 
 <script>
@@ -56,7 +92,7 @@ export default {
 <style scoped>
 .select-bar{
     margin: 0 auto;
-    width: 80%;
-    height: 100px;
+    /*width: 80%;*/
+    /*height: 100px;*/
 }
 </style>
