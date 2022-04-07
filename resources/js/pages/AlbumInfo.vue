@@ -1,11 +1,13 @@
 <template>
     <div>
-        <vue-header/>
+
         <div class = "header" style="margin-left: 200px" >
             <span v-for="artist in album.artists" >
-               <a :href="$link['artists'] + artist.id" class="custom-link"> {{artist.name}}</a>  <span v-if="artist !== album.artists[album.artists.length -1]">, </span>
+               <router-link
+                            :to="{name: 'artist', params: {id: artist.id}}" class="custom-link"> {{artist.name}}</router-link>
+                <span v-if="artist !== album.artists[album.artists.length -1]">, </span>
             </span> <span v-if="album.artists && album.artists.length > 0">-</span>
-            <a class="custom-link" :href="$link['albums'] + album.id" >{{album.name}}</a>
+            <span class="custom-link">{{album.name}}</span>
         </div> <hr>
         <div style="margin-left: 200px" >
             <p class="mention align-items-center">История прослушиваний</p>

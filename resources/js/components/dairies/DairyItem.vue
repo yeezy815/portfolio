@@ -6,58 +6,63 @@
         >
             <div class="col">
                 <div class="row">
-                    <div class="col-4" >
-                       <p>Дата:
-                           <my-input v-model="dairy.date" v-if="edit" placeholder="гггг-мм-дд" @input="input"/>
-                           <span v-else>{{dairy.date}}</span>    </p>
+                    <div class="col-4">
+                        <p>Дата:
+                            <my-input v-model="dairy.date" v-if="edit" placeholder="гггг-мм-дд" @input="input"/>
+                            <span v-else>{{ dairy.date }}</span></p>
                     </div>
 
-                    <div class="col" v-show="hover && !creation" >
+                    <div class="col" v-show="hover && !creation">
                         <button @click="edit = true" class="btn btn-info">Изменить</button>
                         <button @click="$emit('remove', dairy)" class="btn btn-danger">Удалить</button>
                     </div>
                 </div>
 
-                <div class="row" >
-                    <div class="col album-info" @click="editAlbum" >
+                <div class="row">
+                    <div class="col album-info" @click="editAlbum">
                         <div class="col">
                             <p>Альбом:
-                              <a :href="(!edit) ? $link['albums'] + dairy.albums.id :null" class="item-link" v-if="dairy.albums">
-                                <span >{{dairy.albums.name}}</span>
-                              </a>
+                                <router-link :to=" (!edit) ? {name: 'album', params: {id: dairy.albums.id}} : '#'"
+                                             class="item-link" v-if="dairy.albums">
+                                    <span>{{ dairy.albums.name }}</span>
+                                </router-link>
                             </p>
                         </div>
 
                         <div class="col" v-if="dairy.albums && dairy.albums.artists && dairy.albums.artists.length >0">
                             <span>Исполнитель:</span><br>
                             <span v-for="artist in dairy.albums.artists">
-                                <a :href="(!edit) ? $link['artists'] + artist.id : null" class="item-link">    {{artist.name}} </a>
-                                <span v-if="artist.id !== dairy.albums.artists[dairy.albums.artists.length-1].id">, </span>
+                                <router-link
+                                    :to=" (!edit) ? {name: 'artist', params: {id:artist.id}} : '#'"
+                                    class="item-link">    {{ artist.name }}
+                                </router-link>
+                                <span
+                                    v-if="artist.id !== dairy.albums.artists[dairy.albums.artists.length-1].id">, </span>
                             </span>
                         </div>
                     </div>
 
-                    <div class="col" >
-                        <p>Оценка: <input v-model="dairy.score"  v-if="edit" placeholder="оценка" >
-                        <span v-else><br> {{dairy.score}}</span>
+                    <div class="col">
+                        <p>Оценка: <input v-model="dairy.score" v-if="edit" placeholder="оценка">
+                            <span v-else><br> {{ dairy.score }}</span>
                         </p>
                     </div>
 
                 </div>
             </div>
 
-            <div class="col-5" >
+            <div class="col-5">
                 <p>Впечатление:
-                 </p>
+                </p>
                 <textarea v-if="edit" v-model="dairy.experience" style="width: 100%"></textarea>
-                <p v-else>{{dairy.experience}}</p>
+                <p v-else>{{ dairy.experience }}</p>
 
             </div>
 
-            <div class="col-4" >
+            <div class="col-4">
                 <p>Описание: </p>
-                 <textarea v-if="edit" v-model="dairy.description" style="width: 100%"></textarea>
-                <p v-else>{{dairy.description}}</p>
+                <textarea v-if="edit" v-model="dairy.description" style="width: 100%"></textarea>
+                <p v-else>{{ dairy.description }}</p>
 
             </div>
 
@@ -65,7 +70,7 @@
                 <button @click="save" class="btn btn-success">Сохранить</button>
                 <button class="btn btn-secondary" @click="cancelEdit">Отменить</button>
             </div>
-            <item-status v-if="dairy.status" :item="dairy.status" />
+            <item-status v-if="dairy.status" :item="dairy.status"/>
         </div>
     </div>
 
@@ -80,8 +85,8 @@ export default {
     name: "DairyItem",
     emits: ['remove', 'confirm', 'cancel', 'editalbum'],
     components: {ItemStatus, MyInput, AlbumArtist},
-    data(){
-        return{
+    data() {
+        return {
             hover: false,
             edit: false,
             defaultItem: {
@@ -91,13 +96,13 @@ export default {
                 experience: '',
                 description: '',
                 album_id: null,
-                albums:{}
+                albums: {}
             }
 
         }
     },
-    props:{
-      dairy:{
+    props: {
+        dairy: {
             type: Object,
             default: {
                 id: Date.now(),
@@ -106,20 +111,20 @@ export default {
                 experience: '',
                 description: '',
                 album_id: null,
-                albums:{}
+                albums: {}
             },
             required: false
         },
-        creation:{
+        creation: {
             type: Boolean,
             default: false
         }
     },
 
 
-    watch:{
-        edit(newVal){
-            if (newVal){
+    watch: {
+        edit(newVal) {
+            if (newVal) {
                 for (let key in this.dairy) {
                     this.defaultItem[key] = this.dairy[key];
                 }
@@ -128,48 +133,47 @@ export default {
     },
 
     mounted() {
-        if (this.creation === true){
+        if (this.creation === true) {
             for (let key in this.defaultItem) {
-                this.dairy[key] =  this.defaultItem[key];
+                this.dairy[key] = this.defaultItem[key];
             }
             this.defaultItem = {} //this.dairy
             this.edit = true
         }
     },
-    methods:{
-        input: function(key) {
-            this.dairy.date =  this.dairy.date.replace(/[^0-9-]+/g, "")
+    methods: {
+        input: function (key) {
+            this.dairy.date = this.dairy.date.replace(/[^0-9-]+/g, "")
         },
-        save(){
+        save() {
             this.$emit('confirm', this.dairy)
             if (!this.creation) {
-                this.edit = false ;
-            }
-            else{
+                this.edit = false;
+            } else {
                 for (let key in this.defaultItem)
                     this.dairy[key] = this.defaultItem[key]
             }
         },
 
-        cancelEdit(){
+        cancelEdit() {
             for (let key in this.defaultItem)
                 this.dairy[key] = this.defaultItem[key]
             if (!this.creation)
-                 this.edit = false
+                this.edit = false
             else
                 this.$emit('cancel')
         },
-        editAlbum(){
+        editAlbum() {
             if (this.edit)
-                this.$emit('editalbum',this.dairy)
+                this.$emit('editalbum', this.dairy)
         },
     }
 }
 </script>
 
 <style scoped>
-.album-item{
-    background-color:rgba(172,177,150,0.58);
+.album-item {
+    background-color: rgba(172, 177, 150, 0.58);
     width: 100%;
     min-height: 50px;
     border: 1px solid;
@@ -177,15 +181,16 @@ export default {
     margin-bottom: 5px;
 }
 
-.album-info:hover{
+.album-info:hover {
     background-color: #cbd5e0;
 }
 
-.buttons{
+.buttons {
     margin-top: 5px;
     margin-bottom: 5px;
 }
-.year input{
-    width:60px
+
+.year input {
+    width: 60px
 }
 </style>

@@ -9,11 +9,11 @@
                 <album-artist :artists="album.artists" :edit="edit" @remove="deleteArtist"/>
             </div>
             <div class="col" >
-                <a :href="$link['albums'] + album.id"
+                <router-link  :to="{name: 'album', params: {id: album.id}}"
                    v-if="!edit"
                    class="item-link"
                 >
-                    <p>{{album.name}}</p></a>
+                    <p>{{album.name}}</p></router-link>
                 <my-input v-else v-model="album.name" placeholder="альбом"/>
             </div>
             <div class="col-1" >
@@ -26,7 +26,9 @@
                 <button type="button" class="btn btn-danger w-100" v-show="hover"  v-if="!creation"
                 @click="removeAlbum()"
                 >Удалить</button>
-                <button type="button" class="btn btn-info w-100" v-show="hover" @click="edit = true">Изменить</button>
+                <button type="button" class="btn btn-info w-100" v-show="hover"
+                        @click="edit = true"  v-if="!creation">Изменить
+                </button>
             </div>
             <div class="buttons" v-show="edit">
                 <button @click="$emit('confirm', album); edit= false" class="btn btn-success">Сохранить</button>

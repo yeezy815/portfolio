@@ -1,5 +1,4 @@
 <template>
-   <vue-header/>
     <div class="article">
         <p> Записи </p>
     </div>

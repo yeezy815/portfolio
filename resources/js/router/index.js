@@ -8,18 +8,22 @@ import AlbumInfo from "@/pages/AlbumInfo";
 const routes = [
     {
         path: '/albums',
+        name: 'albums',
         component: AlbumList
     },
     {
         path: '/dairy',
+        name: 'dairy',
         component: DairyList
     },
     {
         path: '/artists/:id',
+        name: 'artist',
         component: ArtistInfo
     },
     {
         path: '/albums/:id',
+        name: 'album',
         component: AlbumInfo
     }
 ];

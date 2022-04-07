@@ -1,7 +1,7 @@
 <template>
-    <a v-if="!edit" :href="$link['artists']+ artist.id" class="item-link">
+    <router-link v-if="!edit" :to="{name: 'artist', params: {id: artist.id}}" class="item-link">
         <span>{{artist.name}}</span>
-    </a>
+    </router-link>
     <div v-else @mouseover="showdelete = true" @mouseleave="showdelete = false" style="height: 35px">
 
         <my-input  v-model="artist.name" placeholder="исполнитель" style="width: 50%"/>
