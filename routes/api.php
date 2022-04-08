@@ -15,13 +15,13 @@ use App\Http\Controllers\AlbumController;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+//Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+//    return $request->user();
+//});
 
 Route::get('/artists/{id}',[ArtistController::class,'show']);
 
-Route::resource('albums', AlbumController::class);
+Route::apiResource('albums', AlbumController::class);
 
 Route::apiResource('dairy',\App\Http\Controllers\DairyController::class);
 
