@@ -19,11 +19,8 @@
 <details>
   <summary>Содержание</summary>
   <ol>
-    <li>
-      <a href="#about-the-project">Что это и зачем это нужно?</a>
-    </li>
-        <li><a href="#technologies">Используемые технологии</a></li>
-        <li><a href="#requirements">Технические требования</a></li>
+    <li><a href="#about-the-project">Что это и зачем это нужно?</a></li>
+    <li><a href="#technologies">Используемые технологии</a></li>
     <li><a href="#installation">Установка</a></li>
     <li><a href="#usage">Использование</a></li>
     <li><a href="#license">Лицензия</a></li>
