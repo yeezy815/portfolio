@@ -83,14 +83,8 @@
    git clone https://github.com/yeezy815/portfolio.git
    cd portfolio
    ```
-
-2. Загрузить зависимости проекта и сгенерировать ключ приложения
-    ```sh
-   composer install
-   php artisan key:generate
-   ```
     
-3. Переименовать файл `.env.example` в `.env` и ввести в него данные вашей БД. Пример:
+2. Переименовать файл `.env.example` в `.env` и ввести в него данные вашей БД. Пример:
    ```sh
     DB_CONNECTION=mysql
     DB_HOST=localhost
@@ -99,6 +93,12 @@
     DB_USERNAME=admin
     DB_PASSWORD=qwerty
    ```
+  
+3. Загрузить зависимости проекта и сгенерировать ключ приложения
+    ```sh
+    composer install
+    php artisan key:generate
+    ```
     
 4. Выполнить миграции
    ```sh
